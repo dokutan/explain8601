@@ -1,0 +1,130 @@
+representation              =  date / time / date-time / interval / repeating-interval
+
+
+
+date                        =  calendar-date / week-date / ordinal-date
+date-tail                   =  calendar-date-tail / week-date-tail / ordinal-date-tail
+
+;; calendar dates
+<calendar-date-complete>    =  year month day
+<calendar-date-complete>    =/ year '-' month '-' day
+calendar-date               =  calendar-date-complete
+calendar-date               =/ year ['-' month]
+calendar-date               =/ century
+calendar-date               =/ decade
+calendar-date-tail          =  [month ['-']] day
+; expanded
+calendar-date               =/ pm year-expanded month day
+calendar-date               =/ pm year-expanded ['-' month ['-' day]]
+calendar-date               =/ pm decade-expanded
+calendar-date               =/ pm century-expanded
+
+;; week dates
+<week-date-complete>        =  year 'W' week weekday
+<week-date-complete>        =/ year '-' 'W' week '-' weekday
+week-date                   =  week-date-complete
+week-date                   =  year 'W' week
+week-date                   =/ year '-' 'W' week
+week-date-tail              =  ['W' week ['-']] weekday
+; expanded
+week-date                   =/ pm year-expanded 'W' week [weekday]
+week-date                   =/ pm year-expanded '-' 'W' week ['-' weekday]
+
+;; ordinal dates
+<ordinal-date-complete>     =  year day-of-year
+<ordinal-date-complete>     =/ year '-' day-of-year
+ordinal-date                =  ordinal-date-complete
+ordinal-date-tail           =  day-of-year
+; expanded
+ordinal-date                =/ pm year-expanded day-of-year
+ordinal-date                =/ pm year-expanded '-' day-of-year
+
+
+
+time                        =  normal-time [timezone]
+time                        =/ decimal-time [timezone]
+time-tail                   =  normal-time-tail [timezone]
+time-tail                   =  decimal-time-tail [timezone]
+
+;; times
+<normal-time-complete>      =  hour minute second
+<normal-time-complete>      =/ hour ':' minute ':' second
+<normal-time-t>             =  'T' hour [minute [second]]
+normal-time                 =  normal-time-t
+normal-time                 =/ ['T'] hour ':' minute [':' second]
+normal-time-tail            =  [[hour ] minute ] second
+normal-time-tail            =/ [[hour ':'] minute ':'] ':' second ; TODO e.g. mm
+
+;; times with decimal fraction (TODO consider replacing)
+<decimal-time-t>            =  'T' hour [minute [second]] fraction
+decimal-time                =  decimal-time-t
+decimal-time                =/ hour ':' minute [':' second] fraction
+decimal-time-tail           =  [[hour] minute] second fraction
+decimal-time-tail           =/ [[hour ':'] minute ':'] second fraction ; TODO e.g. mm.m
+
+;; time zone designator
+timezone                    =  'Z'
+timezone                    =/ pm hour [[':'] minute]
+
+
+
+date-time                   =  date-complete time-t
+<date-complete>             =  calendar-date-complete / week-date-complete / ordinal-date-complete
+<time-t>                    =  normal-time-t / decimal-time-t
+<time-t>                    =/ 'T' normal-time
+<time-t>                    =/ 'T' decimal-time
+
+
+
+duration                    =  duration-complete / duration-alternative
+
+<duration-complete>         =  'P' years 'Y' months 'M' days 'D' 'T' hours 'H' minutes 'M' seconds 'S'
+<duration-complete>         =/ 'P' weeks 'W'
+
+; TODO allow omitted elements
+; duration                    =/ 'P' 1* DIGIT 'Y' [1* DIGIT 'M' [1* DIGIT 'D' ['T'  1* DIGIT 'H'  [1* DIGIT 'M'  [1* DIGIT 'S']]]]]
+
+<duration-alternative>      =  'P' calendar-date-complete 'T' normal-time-complete
+<duration-alternative>      =/ 'P' ordinal-date-complete 'T' normal-time-complete
+
+
+
+interval                    =  start solidus end
+interval                    =/ start solidus duration
+interval                    =/ duration solidus end
+interval                    =/ duration
+
+start                       =  date / date-time
+end                         =  date / date-time
+end                         =/ date-tail time-t
+
+
+
+repeating-interval          =  'R' repetitions solidus interval
+repetitions                 =  '-1' / * DIGIT
+
+
+year                        =  4 DIGIT
+month                       =  2 DIGIT
+day                         =  2 DIGIT
+decade                      =  3 DIGIT
+century                     =  2 DIGIT
+year-expanded               =  5* DIGIT ; assuming expansion by 1 digit
+decade-expanded             =  4* DIGIT ; assuming expansion by 1 digit
+century-expanded            =  3* DIGIT ; assuming expansion by 1 digit
+day-of-year                 =  3 DIGIT ; actually 001 - 366
+week                        =  2 DIGIT ; actually 01 - 53
+weekday                     =  1 DIGIT ; actually 1 - 7
+hour                        =  2 DIGIT ; actually 00 - 23
+minute                      =  2 DIGIT ; actually 00 - 59
+second                      =  2 DIGIT ; actually 00 - 60
+years                       =  1* DIGIT
+months                      =  1* DIGIT
+weeks                       =  1* DIGIT
+days                        =  1* DIGIT
+hours                       =  1* DIGIT
+minutes                     =  1* DIGIT
+seconds                     =  1* DIGIT
+fraction                    =  ('.' / ',') 1* DIGIT
+pm                          =  '+' / '-' / %x2212
+solidus                     =  '/' / '--'
