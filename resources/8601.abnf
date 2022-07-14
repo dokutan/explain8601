@@ -1,4 +1,4 @@
-representation              =  date / time / date-time / interval / repeating-interval
+representation              =  date / time / date-time / timezone / interval / repeating-interval
 
 
 
@@ -49,18 +49,16 @@ time-tail                   =  decimal-time-tail [timezone]
 ;; times
 <normal-time-complete>      =  hour minute second
 <normal-time-complete>      =/ hour ':' minute ':' second
-<normal-time-t>             =  'T' hour [minute [second]]
-normal-time                 =  normal-time-t
-normal-time                 =/ ['T'] hour ':' minute [':' second]
+normal-time                 =  normal-time-complete
+normal-time                 =/ ['T'] hour [minute [second]]
+normal-time                 =/ ['T'] hour [':' minute [':' second]]
 normal-time-tail            =  [[hour ] minute ] second
 normal-time-tail            =/ [[hour ':'] minute ':'] ':' second ; TODO e.g. mm
 
-;; times with decimal fraction (TODO consider replacing)
+;; times with decimal fraction
+decimal-time                =  normal-time fraction
 <decimal-time-t>            =  'T' hour [minute [second]] fraction
-decimal-time                =  decimal-time-t
-decimal-time                =/ hour ':' minute [':' second] fraction
-decimal-time-tail           =  [[hour] minute] second fraction
-decimal-time-tail           =/ [[hour ':'] minute ':'] second fraction ; TODO e.g. mm.m
+decimal-time-tail           =  normal-time-tail fraction
 
 ;; time zone designator
 timezone                    =  'Z'
@@ -70,9 +68,7 @@ timezone                    =/ pm hour [[':'] minute]
 
 date-time                   =  date-complete time-t
 <date-complete>             =  calendar-date-complete / week-date-complete / ordinal-date-complete
-<time-t>                    =  normal-time-t / decimal-time-t
-<time-t>                    =/ 'T' normal-time
-<time-t>                    =/ 'T' decimal-time
+<time-t>                    =  'T' time
 
 
 
@@ -109,9 +105,9 @@ month                       =  2 DIGIT
 day                         =  2 DIGIT
 decade                      =  3 DIGIT
 century                     =  2 DIGIT
-year-expanded               =  5* DIGIT ; assuming expansion by 1 digit
-decade-expanded             =  4* DIGIT ; assuming expansion by 1 digit
-century-expanded            =  3* DIGIT ; assuming expansion by 1 digit
+year-expanded               =  4* DIGIT ; assuming expansion by 0 digits
+decade-expanded             =  3* DIGIT ; assuming expansion by 0 digits
+century-expanded            =  2* DIGIT ; assuming expansion by 0 digits
 day-of-year                 =  3 DIGIT ; actually 001 - 366
 week                        =  2 DIGIT ; actually 01 - 53
 weekday                     =  1 DIGIT ; actually 1 - 7
