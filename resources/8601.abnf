@@ -53,7 +53,7 @@ normal-time                 =  normal-time-complete
 normal-time                 =/ ['T'] hour [minute [second]]
 normal-time                 =/ ['T'] hour [':' minute [':' second]]
 normal-time-tail            =  [[hour ] minute ] second
-normal-time-tail            =/ [[hour ':'] minute ':'] ':' second ; TODO e.g. mm
+normal-time-tail            =/ [[hour ':'] minute ':'] second
 
 ;; times with decimal fraction
 decimal-time                =  normal-time fraction
@@ -74,14 +74,13 @@ date-time                   =  date-complete time-t
 
 duration                    =  duration-complete / duration-alternative
 
+duration                    =/ 'P' [years 'Y'] [months 'M'] [days 'D'] ['T'  [hours 'H']  [minutes 'M']  [seconds 'S']]
+
 <duration-complete>         =  'P' years 'Y' months 'M' days 'D' 'T' hours 'H' minutes 'M' seconds 'S'
 <duration-complete>         =/ 'P' weeks 'W'
-
-; TODO allow omitted elements
-; duration                    =/ 'P' 1* DIGIT 'Y' [1* DIGIT 'M' [1* DIGIT 'D' ['T'  1* DIGIT 'H'  [1* DIGIT 'M'  [1* DIGIT 'S']]]]]
-
-<duration-alternative>      =  'P' calendar-date-complete 'T' normal-time-complete
-<duration-alternative>      =/ 'P' ordinal-date-complete 'T' normal-time-complete
+<duration-alternative>      =  'P' calendar-date
+<duration-alternative>      =/ 'P' calendar-date-complete 'T' normal-time
+<duration-alternative>      =/ 'P' ordinal-date-complete ['T' normal-time-complete]
 
 
 
@@ -92,7 +91,8 @@ interval                    =/ duration
 
 start                       =  date / date-time
 end                         =  date / date-time
-end                         =/ date-tail time-t
+end                         =/ date-tail [time-t]
+end                         =/ time-tail
 
 
 
