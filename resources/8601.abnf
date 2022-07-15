@@ -1,126 +1,119 @@
-representation              =  date / time / date-time / timezone / interval / repeating-interval
+representation                =  date / time / date-time / timezone / interval / duration / repeating-interval
 
 
+;; date
+date                          =  calendar-date / week-date / ordinal-date
+date-tail                     =  calendar-date-tail / week-date-tail / ordinal-date-tail
 
-date                        =  calendar-date / week-date / ordinal-date
-date-tail                   =  calendar-date-tail / week-date-tail / ordinal-date-tail
+; calendar dates
+calendar-date                 =  calendar-date-day / calendar-date-month / calendar-date-year / calendar-date-decade / calendar-date-century
+  <calendar-date-day>         =  (year month day) / (year '-' month '-' day) / (pm year-expanded month day) / (pm year-expanded '-' month '-' day)
+  <calendar-date-month>       =  (year '-' month) / (pm year-expanded '-' month)
+  <calendar-date-year>        =  year / (pm year-expanded)
+  <calendar-date-decade>      =  decade / (pm decade-expanded)
+  <calendar-date-century>     =  century / (pm century-expanded)
+calendar-date-tail            =  calendar-date-tail-day / calendar-date-tail-month
+  calendar-date-tail-day      =  [month ['-']] day
+  calendar-date-tail-month    =  month
 
-;; calendar dates
-<calendar-date-complete>    =  year month day
-<calendar-date-complete>    =/ year '-' month '-' day
-calendar-date               =  calendar-date-complete
-calendar-date               =/ year ['-' month]
-calendar-date               =/ century
-calendar-date               =/ decade
-calendar-date-tail          =  [month ['-']] day
-; expanded
-calendar-date               =/ pm year-expanded month day
-calendar-date               =/ pm year-expanded ['-' month ['-' day]]
-calendar-date               =/ pm decade-expanded
-calendar-date               =/ pm century-expanded
+; week dates
+week-date                     =  week-date-day / week-date-week
+  <week-date-day>             =  (year 'W' week weekday) / (year '-' 'W' week '-' weekday) / (pm year-expanded 'W' week weekday) / (pm year-expanded '-' 'W' week '-' weekday)
+  <week-date-week>            =  (year ['-'] 'W' week) / (pm year-expanded ['-'] 'W' week)
+week-date-tail                =  week-date-tail-day / week-date-tail-week
+  week-date-tail-day          =  ['W' week ['-']] weekday
+  week-date-tail-week         =  'W' week
 
-;; week dates
-<week-date-complete>        =  year 'W' week weekday
-<week-date-complete>        =/ year '-' 'W' week '-' weekday
-week-date                   =  week-date-complete
-week-date                   =  year 'W' week
-week-date                   =/ year '-' 'W' week
-week-date-tail              =  ['W' week ['-']] weekday
-; expanded
-week-date                   =/ pm year-expanded 'W' week [weekday]
-week-date                   =/ pm year-expanded '-' 'W' week ['-' weekday]
-
-;; ordinal dates
-<ordinal-date-complete>     =  year day-of-year
-<ordinal-date-complete>     =/ year '-' day-of-year
-ordinal-date                =  ordinal-date-complete
-ordinal-date-tail           =  day-of-year
-; expanded
-ordinal-date                =/ pm year-expanded day-of-year
-ordinal-date                =/ pm year-expanded '-' day-of-year
+; ordinal dates
+ordinal-date                  =  (year ['-'] day-of-year) / (pm year-expanded ['-'] day-of-year)
+ordinal-date-tail             =  day-of-year
 
 
+;; time
+time                          =  time-second / time-minute / time-hour
+  <time-second>               =  ['T'] normal-time-second [fraction] [timezone]
+  <time-minute>               =  ['T'] normal-time-minute [fraction] [timezone]
+  <time-hour>                 =  ['T'] hour [fraction] [timezone]
+time-tail                     =  time-tail-second / time-tail-minute
+  <time-tail-second>          =  normal-time-tail-second [fraction] [timezone]
+  <time-tail-minute>          =  normal-time-tail-minute [fraction] [timezone]
 
-time                        =  normal-time [timezone]
-time                        =/ decimal-time [timezone]
-time-tail                   =  normal-time-tail [timezone]
-time-tail                   =  decimal-time-tail [timezone]
+<normal-time>                 =  normal-time-second / normal-time-minute / hour
+<normal-time-second>          =  (hour minute second) / (hour ':' minute ':' second)
+<normal-time-minute>          =  hour [':'] minute
 
-;; times
-<normal-time-complete>      =  hour minute second
-<normal-time-complete>      =/ hour ':' minute ':' second
-normal-time                 =  normal-time-complete
-normal-time                 =/ ['T'] hour [minute [second]]
-normal-time                 =/ ['T'] hour [':' minute [':' second]]
-normal-time-tail            =  [[hour ] minute ] second
-normal-time-tail            =/ [[hour ':'] minute ':'] second
+<normal-time-tail-second>   =  [hour [':'] [minute [':']]] second
+<normal-time-tail-minute>   =  [hour [':']] minute
 
-;; times with decimal fraction
-decimal-time                =  normal-time fraction
-<decimal-time-t>            =  'T' hour [minute [second]] fraction
-decimal-time-tail           =  normal-time-tail fraction
 
 ;; time zone designator
-timezone                    =  'Z'
-timezone                    =/ pm hour [[':'] minute]
+timezone                      =  'Z' / (pm hour [[':'] minute])
+
+
+;; date + time
+date-time                     =  date-day 'T' time
+  <date-day>                  =  calendar-date-day / week-date-day / ordinal-date
+
+
+;; duration
+duration                      =  duration-complete / duration-alternative
+duration                      =/ 'P' [years 'Y'] [months 'M'] [days 'D'] ['T'  [hours 'H']  [minutes 'M']  [seconds 'S']]
+  <duration-complete>         =  'P' years 'Y' months 'M' days 'D' 'T' hours 'H' minutes 'M' seconds 'S'
+  <duration-complete>         =/ 'P' weeks 'W'
+  <duration-alternative>      =  'P' calendar-date
+  <duration-alternative>      =/ 'P' calendar-date-day 'T' normal-time
+  <duration-alternative>      =/ 'P' ordinal-date ['T' normal-time]
+
+
+;; interval
+interval                      =  (date / date-time) solidus duration
+interval                      =/ duration solidus (date / date-time)
+interval                      =/ calendar-date-century solidus calendar-date-century
+interval                      =/ calendar-date-decade solidus calendar-date-decade
+interval                      =/ calendar-date-year solidus calendar-date-year
+interval                      =/ calendar-date-month solidus (calendar-date-month / calendar-date-tail-month)
+interval                      =/ calendar-date-day solidus (calendar-date-day / calendar-date-tail-day)
+interval                      =/ week-date-week solidus (week-date-week / week-date-tail-week)
+interval                      =/ week-date-day solidus (week-date-day / week-date-tail-day)
+interval                      =/ ordinal-date solidus (ordinal-date / ordinal-date-tail)
+interval                      =/ calendar-date-day 'T' time-second solidus (time-tail-second / ((calendar-date-day / calendar-date-tail-day) 'T' time-second))
+interval                      =/ week-date-day 'T' time-second solidus (time-tail-second / ((week-date-day / week-date-tail-day) 'T' time-second))
+interval                      =/ ordinal-date 'T' time-second solidus (time-tail-second / ((ordinal-date / ordinal-date-tail) 'T' time-second))
+interval                      =/ calendar-date-day 'T' time-minute solidus (time-tail-minute / ((calendar-date-day / calendar-date-tail-day) 'T' time-minute))
+interval                      =/ week-date-day 'T' time-minute solidus (time-tail-minute / ((week-date-day / week-date-tail-day) 'T' time-minute))
+interval                      =/ ordinal-date 'T' time-minute solidus (time-tail-minute / ((ordinal-date / ordinal-date-tail) 'T' time-minute))
+interval                      =/ calendar-date-day 'T' time-hour solidus (hour / ((calendar-date-day / calendar-date-tail-day) 'T' time-hour))
+interval                      =/ week-date-day 'T' time-hour solidus (hour / ((week-date-day / week-date-tail-day) 'T' time-hour))
+interval                      =/ ordinal-date 'T' time-hour solidus (hour / ((ordinal-date / ordinal-date-tail) 'T' time-hour))
+
+
+;; repeating interval
+repeating-interval            =  'R' repetitions solidus interval
+repetitions                   =  '-1' / * DIGIT
 
 
 
-date-time                   =  date-complete time-t
-<date-complete>             =  calendar-date-complete / week-date-complete / ordinal-date-complete
-<time-t>                    =  'T' time
-
-
-
-duration                    =  duration-complete / duration-alternative
-
-duration                    =/ 'P' [years 'Y'] [months 'M'] [days 'D'] ['T'  [hours 'H']  [minutes 'M']  [seconds 'S']]
-
-<duration-complete>         =  'P' years 'Y' months 'M' days 'D' 'T' hours 'H' minutes 'M' seconds 'S'
-<duration-complete>         =/ 'P' weeks 'W'
-<duration-alternative>      =  'P' calendar-date
-<duration-alternative>      =/ 'P' calendar-date-complete 'T' normal-time
-<duration-alternative>      =/ 'P' ordinal-date-complete ['T' normal-time-complete]
-
-
-
-interval                    =  start solidus end
-interval                    =/ start solidus duration
-interval                    =/ duration solidus end
-interval                    =/ duration
-
-start                       =  date / date-time
-end                         =  date / date-time
-end                         =/ date-tail [time-t]
-end                         =/ time-tail
-
-
-
-repeating-interval          =  'R' repetitions solidus interval
-repetitions                 =  '-1' / * DIGIT
-
-
-year                        =  4 DIGIT
-month                       =  2 DIGIT
-day                         =  2 DIGIT
-decade                      =  3 DIGIT
-century                     =  2 DIGIT
-year-expanded               =  4* DIGIT ; assuming expansion by 0 digits
-decade-expanded             =  3* DIGIT ; assuming expansion by 0 digits
-century-expanded            =  2* DIGIT ; assuming expansion by 0 digits
-day-of-year                 =  3 DIGIT ; actually 001 - 366
-week                        =  2 DIGIT ; actually 01 - 53
-weekday                     =  1 DIGIT ; actually 1 - 7
-hour                        =  2 DIGIT ; actually 00 - 23
-minute                      =  2 DIGIT ; actually 00 - 59
-second                      =  2 DIGIT ; actually 00 - 60
-years                       =  1* DIGIT
-months                      =  1* DIGIT
-weeks                       =  1* DIGIT
-days                        =  1* DIGIT
-hours                       =  1* DIGIT
-minutes                     =  1* DIGIT
-seconds                     =  1* DIGIT
-fraction                    =  ('.' / ',') 1* DIGIT
-pm                          =  '+' / '-' / %x2212
-solidus                     =  '/' / '--'
+year                          =  4 DIGIT
+month                         =  2 DIGIT
+day                           =  2 DIGIT
+decade                        =  3 DIGIT
+century                       =  2 DIGIT
+year-expanded                 =  4* DIGIT ; assuming expansion by 0 digits
+decade-expanded               =  3* DIGIT ; assuming expansion by 0 digits
+century-expanded              =  2* DIGIT ; assuming expansion by 0 digits
+day-of-year                   =  3 DIGIT ; actually 001 - 366
+week                          =  2 DIGIT ; actually 01 - 53
+weekday                       =  '1' / '2' / '3' / '4' / '5' / '6' / '7'
+hour                          =  2 DIGIT ; actually 00 - 23
+minute                        =  2 DIGIT ; actually 00 - 59
+second                        =  2 DIGIT ; actually 00 - 60
+years                         =  1* DIGIT
+months                        =  1* DIGIT
+weeks                         =  1* DIGIT
+days                          =  1* DIGIT
+hours                         =  1* DIGIT
+minutes                       =  1* DIGIT
+seconds                       =  1* DIGIT
+fraction                      =  ('.' / ',') 1* DIGIT
+pm                            =  '+' / '-' / %x2212
+solidus                       =  '/' / '--'
