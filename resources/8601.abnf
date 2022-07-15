@@ -6,9 +6,10 @@ date                          =  calendar-date / week-date / ordinal-date
 date-tail                     =  calendar-date-tail / week-date-tail / ordinal-date-tail
 
 ; calendar dates
-calendar-date                 =  calendar-date-day / calendar-date-month / calendar-date-year / calendar-date-decade / calendar-date-century
+calendar-date                 =  calendar-date-day / calendar-date-month / calendar-date-grouping / calendar-date-year / calendar-date-decade / calendar-date-century
   <calendar-date-day>         =  (year month day) / (year '-' month '-' day) / (pm year-expanded month day) / (pm year-expanded '-' month '-' day)
   <calendar-date-month>       =  (year '-' month) / (pm year-expanded '-' month)
+  <calendar-date-grouping>    =  (year '-' grouping) / (pm year-expanded '-' grouping)
   <calendar-date-year>        =  year / (pm year-expanded)
   <calendar-date-decade>      =  decade / (pm decade-expanded)
   <calendar-date-century>     =  century / (pm century-expanded)
@@ -94,7 +95,7 @@ repetitions                   =  '-1' / * DIGIT
 
 
 year                          =  4 DIGIT
-month                         =  2 DIGIT
+month                         =  '01' / '02' / '03' / '04' / '05' / '06' / '07' / '08' / '09' / '10' / '11' / '12'
 day                           =  2 DIGIT
 decade                        =  3 DIGIT
 century                       =  2 DIGIT
@@ -117,3 +118,5 @@ seconds                       =  1* DIGIT
 fraction                      =  ('.' / ',') 1* DIGIT
 pm                            =  '+' / '-' / %x2212
 solidus                       =  '/' / '--'
+grouping                      =  '21' / '22' / '23' / '24' / '25' / '26' / '27' / '28' / '29' / '30'
+grouping                      =/ '31' / '32' / '33' / '34' / '35' / '36' / '37' / '38' / '39' / '40' / '41'
