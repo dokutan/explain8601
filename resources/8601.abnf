@@ -1,8 +1,9 @@
-representation                =  date / time / date-time / timezone / interval / duration / repeating-interval
+representation                =  date / date-e / time / time-e / date-time / date-time-e / timezone / timezone-e / interval / interval-e / duration / recurring-interval
 
 
 ;; date
 date                          =  calendar-date / week-date / ordinal-date
+date-e                        =  calendar-date-e / week-date-e / ordinal-date-e
 date-tail                     =  calendar-date-tail / week-date-tail / ordinal-date-tail
 
 ; calendar dates
@@ -17,6 +18,19 @@ calendar-date-tail            =  calendar-date-tail-day / calendar-date-tail-mon
   calendar-date-tail-day      =  [month ['-']] day
   calendar-date-tail-month    =  month
 
+; calendar dates (explicit form)
+calendar-date-e               =  calendar-date-day-e / calendar-date-month-e / calendar-date-grouping-e / calendar-date-year-e / calendar-date-decade-e / calendar-date-century-e
+  <calendar-date-day-e>       =  year-e month-e day-e [timezone-e]
+  <calendar-date-month-e>     =  year-e month-e [timezone-e]
+  <calendar-date-grouping-e>  =  year-e grouping-e [timezone-e]
+  <calendar-date-year-e>      =  year-e [timezone-e]
+  <calendar-date-decade-e>    =  decade-e [timezone-e]
+  <calendar-date-century-e>   =  century-e [timezone-e]
+calendar-date-tail-e          =  calendar-date-tail-day-e / calendar-date-tail-month-e
+  calendar-date-tail-day-e    =  [month-e] day-e [timezone-e]
+  calendar-date-tail-month-e  =  month-e [timezone-e]
+
+
 ; week dates
 week-date                     =  week-date-day / week-date-week
   <week-date-day>             =  (year 'W' week weekday) / (year '-' 'W' week '-' weekday) / (pm year-expanded 'W' week weekday) / (pm year-expanded '-' 'W' week '-' weekday)
@@ -25,9 +39,22 @@ week-date-tail                =  week-date-tail-day / week-date-tail-week
   week-date-tail-day          =  ['W' week ['-']] weekday
   week-date-tail-week         =  'W' week
 
+; week dates (explicit form)
+week-date-e                   =  week-date-day-e / week-date-week-e
+  <week-date-day-e>           =  year-e week-e weekday-e [timezone-e]
+  <week-date-week-e>          =  year-e week-e [timezone-e]
+week-date-tail-e              =  week-date-tail-day-e / week-date-tail-week-e
+  week-date-tail-day-e        =  [week-e] weekday-e [timezone-e]
+  week-date-tail-week-e       =  week-e [timezone-e]
+
+
 ; ordinal dates
 ordinal-date                  =  (year ['-'] day-of-year) / (pm year-expanded ['-'] day-of-year)
 ordinal-date-tail             =  day-of-year
+
+; ordinal dates (explicit form)
+ordinal-date-e                =  year-e day-of-year-e [timezone-e]
+ordinal-date-tail-e           =  day-of-year-e [timezone-e]
 
 
 ;; time
@@ -35,9 +62,9 @@ time                          =  time-second / time-minute / time-hour
   <time-second>               =  ['T'] normal-time-second [fraction] [timezone]
   <time-minute>               =  ['T'] normal-time-minute [fraction] [timezone]
   <time-hour>                 =  ['T'] hour [fraction] [timezone]
-time-tail                     =  time-tail-second / time-tail-minute
-  <time-tail-second>          =  normal-time-tail-second [fraction] [timezone]
+time-tail                     =  time-tail-minute / time-tail-second
   <time-tail-minute>          =  normal-time-tail-minute [fraction] [timezone]
+  <time-tail-second>          =  normal-time-tail-second [fraction] [timezone]
 
 <normal-time>                 =  normal-time-second / normal-time-minute / hour
 <normal-time-second>          =  (hour minute second) / (hour ':' minute ':' second)
@@ -46,14 +73,30 @@ time-tail                     =  time-tail-second / time-tail-minute
 <normal-time-tail-second>   =  [hour [':'] [minute [':']]] second
 <normal-time-tail-minute>   =  [hour [':']] minute
 
+;; time (explicit form)
+time-e                        =  time-second-e / time-minute-e / time-hour-e
+  <time-second-e>             =  ['T'] [hour-e] [minute-e] (second-e / second-e-fraction) [timezone-e]
+  <time-minute-e>             =  ['T'] [hour-e] (minute-e / minute-e-fraction) [timezone-e]
+  <time-hour-e>               =  ['T'] (hour-e / hour-e-fraction) [timezone-e]
+  <time-tail-hour-e>          =  time-hour-e
+  <time-tail-minute-e>        =  time-minute-e
+  <time-tail-second-e>        =  time-second-e
+
 
 ;; time zone designator
 timezone                      =  'Z' / (pm hour [[':'] minute])
+
+;; time zone designator (explicit form)
+timezone-e                    =  'Z' [[minus] time-e]
 
 
 ;; date + time
 date-time                     =  date-day 'T' time
   <date-day>                  =  calendar-date-day / week-date-day / ordinal-date
+
+;; date + time (explicit form)
+date-time-e                   =  date-day-e time-e
+  <date-day-e>                =  calendar-date-day-e / week-date-day-e / ordinal-date-e
 
 
 ;; duration
@@ -87,27 +130,70 @@ interval                      =/ calendar-date-day 'T' time-hour solidus (hour /
 interval                      =/ week-date-day 'T' time-hour solidus (hour / ((week-date-day / week-date-tail-day) 'T' time-hour))
 interval                      =/ ordinal-date 'T' time-hour solidus (hour / ((ordinal-date / ordinal-date-tail) 'T' time-hour))
 
+;; interval (explicit form)
+interval-e                    =  (date-e / date-time-e) solidus duration
+interval-e                    =/ duration solidus (date-e / date-time-e)
+interval-e                    =/ calendar-date-century-e solidus calendar-date-century-e
+interval-e                    =/ calendar-date-decade-e solidus calendar-date-decade-e
+interval-e                    =/ calendar-date-year-e solidus calendar-date-year-e
+interval-e                    =/ calendar-date-month-e solidus (calendar-date-month-e / calendar-date-tail-month-e)
+interval-e                    =/ calendar-date-day-e solidus (calendar-date-day-e / calendar-date-tail-day-e)
+interval-e                    =/ week-date-week-e solidus (week-date-week-e / week-date-tail-week-e)
+interval-e                    =/ week-date-day-e solidus (week-date-day-e / week-date-tail-day-e)
+interval-e                    =/ ordinal-date-e solidus (ordinal-date-e / ordinal-date-tail-e)
+interval-e                    =/ calendar-date-day-e 'T' time-second-e solidus (time-tail-second-e / ((calendar-date-day-e / calendar-date-tail-day-e) 'T' time-second-e))
+interval-e                    =/ week-date-day-e 'T' time-second-e solidus (time-tail-second-e / ((week-date-day-e / week-date-tail-day-e) 'T' time-second-e))
+interval-e                    =/ ordinal-date-e 'T' time-second-e solidus (time-tail-second-e / ((ordinal-date-e / ordinal-date-tail-e) 'T' time-second-e))
+interval-e                    =/ calendar-date-day-e 'T' time-minute-e solidus (time-tail-minute-e / ((calendar-date-day-e / calendar-date-tail-day-e) 'T' time-minute-e))
+interval-e                    =/ week-date-day-e 'T' time-minute-e solidus (time-tail-minute-e / ((week-date-day-e / week-date-tail-day-e) 'T' time-minute-e))
+interval-e                    =/ ordinal-date-e 'T' time-minute-e solidus (time-tail-minute-e / ((ordinal-date-e / ordinal-date-tail-e) 'T' time-minute-e))
+interval-e                    =/ calendar-date-day-e 'T' time-hour-e solidus (time-tail-hour-e / ((calendar-date-day-e / calendar-date-tail-day-e) 'T' time-hour-e))
+interval-e                    =/ week-date-day-e 'T' time-hour-e solidus (time-tail-hour-e / ((week-date-day-e / week-date-tail-day-e) 'T' time-hour-e))
+interval-e                    =/ ordinal-date-e 'T' time-hour-e solidus (time-tail-hour-e / ((ordinal-date-e / ordinal-date-tail-e) 'T' time-hour-e))
 
-;; repeating interval
-repeating-interval            =  'R' repetitions solidus interval
+
+;; recurring interval
+recurring-interval            =  'R' repetitions solidus interval
+recurring-interval            =/ 'R' repetitions solidus interval-e
 repetitions                   =  '-1' / * DIGIT
 
 
 
+century                       =  2 DIGIT
+decade                        =  3 DIGIT
 year                          =  4 DIGIT
 month                         =  '01' / '02' / '03' / '04' / '05' / '06' / '07' / '08' / '09' / '10' / '11' / '12'
-day                           =  2 DIGIT
-decade                        =  3 DIGIT
-century                       =  2 DIGIT
-year-expanded                 =  4* DIGIT ; assuming expansion by 0 digits
-decade-expanded               =  3* DIGIT ; assuming expansion by 0 digits
-century-expanded              =  2* DIGIT ; assuming expansion by 0 digits
-day-of-year                   =  3 DIGIT ; actually 001 - 366
 week                          =  2 DIGIT ; actually 01 - 53
 weekday                       =  '1' / '2' / '3' / '4' / '5' / '6' / '7'
+day-of-year                   =  3 DIGIT ; actually 001 - 366
+day                           =  2 DIGIT
 hour                          =  2 DIGIT ; actually 00 - 23
 minute                        =  2 DIGIT ; actually 00 - 59
 second                        =  2 DIGIT ; actually 00 - 60
+grouping                      =  '21' / '22' / '23' / '24' / '25' / '26' / '27' / '28' / '29' / '30'
+grouping                      =/ '31' / '32' / '33' / '34' / '35' / '36' / '37' / '38' / '39' / '40' / '41'
+
+century-e                     =  1* DIGIT <'C'>
+decade-e                      =  1* DIGIT <'J'>
+year-e                        =  [minus] 1* DIGIT <'Y'>
+month-e                       =  * '0' ('1' / '2' / '3' / '4' / '5' / '6' / '7' / '8' / '9' / '10' / '11' / '12') <'M'>
+week-e                        =  1* DIGIT <'W'>
+weekday-e                     =  * '0' ('1' / '2' / '3' / '4' / '5' / '6' / '7') <'K'>
+day-of-year-e                 =  1* DIGIT <'O'>
+day-e                         =  1* DIGIT <'D'>
+hour-e                        =  1* DIGIT <'H'>
+minute-e                      =  1* DIGIT <'M'>
+second-e                      =  1* DIGIT <'S'>
+hour-e-fraction               =  1* DIGIT fraction <'H'>
+minute-e-fraction             =  1* DIGIT fraction <'M'>
+second-e-fraction             =  1* DIGIT fraction <'S'>
+hour-e-0                      =  ''
+minute-e-0                    =  ''
+grouping-e                    =  * '0' grouping <'A'>
+
+century-expanded              =  2* DIGIT ; assuming expansion by 0 digits
+decade-expanded               =  3* DIGIT ; assuming expansion by 0 digits
+year-expanded                 =  4* DIGIT ; assuming expansion by 0 digits
 years                         =  1* DIGIT
 months                        =  1* DIGIT
 weeks                         =  1* DIGIT
@@ -117,6 +203,5 @@ minutes                       =  1* DIGIT
 seconds                       =  1* DIGIT
 fraction                      =  ('.' / ',') 1* DIGIT
 pm                            =  '+' / '-' / %x2212
+minus                         =  '-' / %x2212
 solidus                       =  '/' / '--'
-grouping                      =  '21' / '22' / '23' / '24' / '25' / '26' / '27' / '28' / '29' / '30'
-grouping                      =/ '31' / '32' / '33' / '34' / '35' / '36' / '37' / '38' / '39' / '40' / '41'
