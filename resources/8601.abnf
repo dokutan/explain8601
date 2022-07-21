@@ -1,4 +1,10 @@
-representation                =  date / date-e / time / time-e / date-time / date-time-e / timezone / timezone-e / interval / interval-e / duration / recurring-interval
+expression                    =  date-time-expression / set / set-single
+<date-time-expression>        =  date / date-e / time / time-e / date-time / date-time-e / timezone / timezone-e / interval / interval-e / duration / recurring-interval
+
+
+;; set expressions
+set                           =  '{' *(date-time-expression ',') date-time-expression '}'
+set-single                    =  '[' *(date-time-expression ',') date-time-expression ']'
 
 
 ;; date
@@ -112,6 +118,7 @@ duration                      =/ 'P' [years 'Y'] [months 'M'] [days 'D'] ['T'  [
 ;; interval
 interval                      =  (date / date-time) solidus duration
 interval                      =/ duration solidus (date / date-time)
+
 interval                      =/ calendar-date-century solidus calendar-date-century
 interval                      =/ calendar-date-decade solidus calendar-date-decade
 interval                      =/ calendar-date-year solidus calendar-date-year
@@ -130,9 +137,34 @@ interval                      =/ calendar-date-day 'T' time-hour solidus (hour /
 interval                      =/ week-date-day 'T' time-hour solidus (hour / ((week-date-day / week-date-tail-day) 'T' time-hour))
 interval                      =/ ordinal-date 'T' time-hour solidus (hour / ((ordinal-date / ordinal-date-tail) 'T' time-hour))
 
+interval                      =/ calendar-date-century solidus interval-limit
+interval                      =/ calendar-date-decade solidus interval-limit
+interval                      =/ calendar-date-year solidus interval-limit
+interval                      =/ calendar-date-month solidus interval-limit
+interval                      =/ calendar-date-day solidus interval-limit
+interval                      =/ week-date-week solidus interval-limit
+interval                      =/ week-date-day solidus interval-limit
+interval                      =/ ordinal-date solidus interval-limit
+interval                      =/ calendar-date-day 'T' time solidus interval-limit
+interval                      =/ week-date-day 'T' time solidus interval-limit
+interval                      =/ ordinal-date 'T' time solidus interval-limit
+
+interval                      =/ interval-limit solidus calendar-date-century
+interval                      =/ interval-limit solidus calendar-date-decade
+interval                      =/ interval-limit solidus calendar-date-year
+interval                      =/ interval-limit solidus calendar-date-month
+interval                      =/ interval-limit solidus calendar-date-day
+interval                      =/ interval-limit solidus week-date-week
+interval                      =/ interval-limit solidus week-date-day
+interval                      =/ interval-limit solidus ordinal-date
+interval                      =/ interval-limit solidus calendar-date-day 'T' time
+interval                      =/ interval-limit solidus week-date-day 'T' time
+interval                      =/ interval-limit solidus ordinal-date 'T' time
+
 ;; interval (explicit form)
 interval-e                    =  (date-e / date-time-e) solidus duration
 interval-e                    =/ duration solidus (date-e / date-time-e)
+
 interval-e                    =/ calendar-date-century-e solidus calendar-date-century-e
 interval-e                    =/ calendar-date-decade-e solidus calendar-date-decade-e
 interval-e                    =/ calendar-date-year-e solidus calendar-date-year-e
@@ -150,6 +182,30 @@ interval-e                    =/ ordinal-date-e 'T' time-minute-e solidus (time-
 interval-e                    =/ calendar-date-day-e 'T' time-hour-e solidus (time-tail-hour-e / ((calendar-date-day-e / calendar-date-tail-day-e) 'T' time-hour-e))
 interval-e                    =/ week-date-day-e 'T' time-hour-e solidus (time-tail-hour-e / ((week-date-day-e / week-date-tail-day-e) 'T' time-hour-e))
 interval-e                    =/ ordinal-date-e 'T' time-hour-e solidus (time-tail-hour-e / ((ordinal-date-e / ordinal-date-tail-e) 'T' time-hour-e))
+
+interval-e                    =/ calendar-date-century-e solidus interval-limit
+interval-e                    =/ calendar-date-decade-e solidus interval-limit
+interval-e                    =/ calendar-date-year-e solidus interval-limit
+interval-e                    =/ calendar-date-month-e solidus interval-limit
+interval-e                    =/ calendar-date-day-e solidus interval-limit
+interval-e                    =/ week-date-week-e solidus interval-limit
+interval-e                    =/ week-date-day-e solidus interval-limit
+interval-e                    =/ ordinal-date-e solidus interval-limit
+interval-e                    =/ calendar-date-day-e 'T' time-e solidus interval-limit
+interval-e                    =/ week-date-day-e 'T' time-e solidus interval-limit
+interval-e                    =/ ordinal-date-e 'T' time-e solidus interval-limit
+
+interval-e                    =/ interval-limit solidus calendar-date-century-e
+interval-e                    =/ interval-limit solidus calendar-date-decade-e
+interval-e                    =/ interval-limit solidus calendar-date-year-e
+interval-e                    =/ interval-limit solidus calendar-date-month-e
+interval-e                    =/ interval-limit solidus calendar-date-day-e
+interval-e                    =/ interval-limit solidus week-date-week-e
+interval-e                    =/ interval-limit solidus week-date-day-e
+interval-e                    =/ interval-limit solidus ordinal-date-e
+interval-e                    =/ interval-limit solidus calendar-date-day-e 'T' time-e
+interval-e                    =/ interval-limit solidus week-date-day-e 'T' time-e
+interval-e                    =/ interval-limit solidus ordinal-date-e 'T' time-e
 
 
 ;; recurring interval
@@ -205,3 +261,7 @@ fraction                      =  ('.' / ',') 1* DIGIT
 pm                            =  '+' / '-' / %x2212
 minus                         =  '-' / %x2212
 solidus                       =  '/' / '--'
+<interval-limit>              =  interval-limit-open / interval-limit-unknown
+interval-limit-open           =  '..'
+interval-limit-unknown        =  ''
+qualifier                     =  '~' / '?' / '%'
