@@ -14,53 +14,53 @@ date-tail                     =  calendar-date-tail / week-date-tail / ordinal-d
 
 ; calendar dates
 calendar-date                 =  calendar-date-day / calendar-date-month / calendar-date-grouping / calendar-date-year / calendar-date-decade / calendar-date-century
-  <calendar-date-day>         =  (year month day) / (year '-' month '-' day) / (pm year-expanded month day) / (pm year-expanded '-' month '-' day)
-  <calendar-date-month>       =  (year '-' month) / (pm year-expanded '-' month)
-  <calendar-date-grouping>    =  (year '-' grouping) / (pm year-expanded '-' grouping)
-  <calendar-date-year>        =  year / (pm year-expanded)
-  <calendar-date-decade>      =  decade / (pm decade-expanded)
-  <calendar-date-century>     =  century / (pm century-expanded)
+  <calendar-date-day>         =  (year month day) / (year [qualifier] '-' month [qualifier] '-' day [qualifier]) / (pm year-expanded month day) / (pm year-expanded [qualifier] '-' month [qualifier] '-' day [qualifier])
+  <calendar-date-month>       =  (year [qualifier] '-' month [qualifier]) / (pm year-expanded [qualifier] '-' month [qualifier])
+  <calendar-date-grouping>    =  (year [qualifier] '-' grouping [qualifier]) / (pm year-expanded [qualifier] '-' grouping [qualifier])
+  <calendar-date-year>        =  (year [qualifier]) / (pm year-expanded [qualifier])
+  <calendar-date-decade>      =  (decade [qualifier]) / (pm decade-expanded [qualifier])
+  <calendar-date-century>     =  (century [qualifier]) / (pm century-expanded [qualifier])
 calendar-date-tail            =  calendar-date-tail-day / calendar-date-tail-month
-  calendar-date-tail-day      =  [month ['-']] day
-  calendar-date-tail-month    =  month
+  calendar-date-tail-day      =  ([month [qualifier] '-'] day [qualifier]) / ([month] day)
+  calendar-date-tail-month    =  month [qualifier]
 
 ; calendar dates (explicit form)
 calendar-date-e               =  calendar-date-day-e / calendar-date-month-e / calendar-date-grouping-e / calendar-date-year-e / calendar-date-decade-e / calendar-date-century-e
-  <calendar-date-day-e>       =  year-e month-e day-e [timezone-e]
-  <calendar-date-month-e>     =  year-e month-e [timezone-e]
-  <calendar-date-grouping-e>  =  year-e grouping-e [timezone-e]
-  <calendar-date-year-e>      =  year-e [timezone-e]
-  <calendar-date-decade-e>    =  decade-e [timezone-e]
-  <calendar-date-century-e>   =  century-e [timezone-e]
+  <calendar-date-day-e>       =  year-e [qualifier] month-e [qualifier] day-e [qualifier] [timezone-e]
+  <calendar-date-month-e>     =  year-e [qualifier] month-e [qualifier] [timezone-e]
+  <calendar-date-grouping-e>  =  year-e [qualifier] grouping-e [qualifier] [timezone-e]
+  <calendar-date-year-e>      =  year-e [qualifier] [timezone-e]
+  <calendar-date-decade-e>    =  decade-e [qualifier] [timezone-e]
+  <calendar-date-century-e>   =  century-e [qualifier] [timezone-e]
 calendar-date-tail-e          =  calendar-date-tail-day-e / calendar-date-tail-month-e
-  calendar-date-tail-day-e    =  [month-e] day-e [timezone-e]
-  calendar-date-tail-month-e  =  month-e [timezone-e]
+  calendar-date-tail-day-e    =  [month-e [qualifier]] day-e [qualifier] [timezone-e]
+  calendar-date-tail-month-e  =  month-e [qualifier] [timezone-e]
 
 
 ; week dates
 week-date                     =  week-date-day / week-date-week
-  <week-date-day>             =  (year 'W' week weekday) / (year '-' 'W' week '-' weekday) / (pm year-expanded 'W' week weekday) / (pm year-expanded '-' 'W' week '-' weekday)
-  <week-date-week>            =  (year ['-'] 'W' week) / (pm year-expanded ['-'] 'W' week)
+  <week-date-day>             =  (year week weekday) / (year [qualifier] '-' week [qualifier] '-' weekday [qualifier]) / (pm year-expanded week weekday) / (pm year-expanded [qualifier] '-' week [qualifier] '-' weekday [qualifier])
+  <week-date-week>            =  (year [[qualifier] '-'] week [qualifier]) / (pm year-expanded [[qualifier] '-'] week [qualifier])
 week-date-tail                =  week-date-tail-day / week-date-tail-week
-  week-date-tail-day          =  ['W' week ['-']] weekday
-  week-date-tail-week         =  'W' week
+  week-date-tail-day          =  ([week [qualifier] '-'] weekday [qualifier]) / ([week] weekday)
+  week-date-tail-week         =  week [qualifier]
 
 ; week dates (explicit form)
 week-date-e                   =  week-date-day-e / week-date-week-e
-  <week-date-day-e>           =  year-e week-e weekday-e [timezone-e]
-  <week-date-week-e>          =  year-e week-e [timezone-e]
+  <week-date-day-e>           =  year-e [qualifier] week-e [qualifier] weekday-e [qualifier] [timezone-e]
+  <week-date-week-e>          =  year-e [qualifier] week-e [qualifier] [timezone-e]
 week-date-tail-e              =  week-date-tail-day-e / week-date-tail-week-e
-  week-date-tail-day-e        =  [week-e] weekday-e [timezone-e]
-  week-date-tail-week-e       =  week-e [timezone-e]
+  week-date-tail-day-e        =  [week-e [qualifier]] weekday-e [qualifier] [timezone-e]
+  week-date-tail-week-e       =  week-e [qualifier] [timezone-e]
 
 
 ; ordinal dates
-ordinal-date                  =  (year ['-'] day-of-year) / (pm year-expanded ['-'] day-of-year)
-ordinal-date-tail             =  day-of-year
+ordinal-date                  =  (year [[qualifier] '-'] day-of-year) / (pm year-expanded [[qualifier] '-'] day-of-year)
+ordinal-date-tail             =  day-of-year [qualifier]
 
 ; ordinal dates (explicit form)
-ordinal-date-e                =  year-e day-of-year-e [timezone-e]
-ordinal-date-tail-e           =  day-of-year-e [timezone-e]
+ordinal-date-e                =  year-e [qualifier] day-of-year-e [qualifier] [timezone-e]
+ordinal-date-tail-e           =  day-of-year-e [qualifier] [timezone-e]
 
 
 ;; time
@@ -73,17 +73,17 @@ time-tail                     =  time-tail-minute / time-tail-second
   <time-tail-second>          =  normal-time-tail-second [fraction] [timezone]
 
 <normal-time>                 =  normal-time-second / normal-time-minute / hour
-<normal-time-second>          =  (hour minute second) / (hour ':' minute ':' second)
-<normal-time-minute>          =  hour [':'] minute
+<normal-time-second>          =  (hour [qualifier] ':' minute [qualifier] ':' second [qualifier]) / (hour minute second)
+<normal-time-minute>          =  (hour [qualifier] ':' minute [qualifier]) / (hour minute)
 
-<normal-time-tail-second>   =  [hour [':'] [minute [':']]] second
-<normal-time-tail-minute>   =  [hour [':']] minute
+<normal-time-tail-second>     =  ([hour [qualifier] ':' [minute [qualifier] ':']] second [qualifier]) / ([hour [minute]] second)
+<normal-time-tail-minute>     =  ([hour [qualifier] ':'] minute) / (hour minute)
 
 ;; time (explicit form)
 time-e                        =  time-second-e / time-minute-e / time-hour-e
-  <time-second-e>             =  ['T'] [hour-e] [minute-e] (second-e / second-e-fraction) [timezone-e]
-  <time-minute-e>             =  ['T'] [hour-e] (minute-e / minute-e-fraction) [timezone-e]
-  <time-hour-e>               =  ['T'] (hour-e / hour-e-fraction) [timezone-e]
+  <time-second-e>             =  ['T'] [hour-e [qualifier]] [minute-e [qualifier]] (second-e / second-e-fraction) [qualifier] [timezone-e]
+  <time-minute-e>             =  ['T'] [hour-e [qualifier]] (minute-e / minute-e-fraction) [qualifier] [timezone-e]
+  <time-hour-e>               =  ['T'] (hour-e / hour-e-fraction) [qualifier] [timezone-e]
   <time-tail-hour-e>          =  time-hour-e
   <time-tail-minute-e>        =  time-minute-e
   <time-tail-second-e>        =  time-second-e
@@ -215,41 +215,41 @@ repetitions                   =  '-1' / * DIGIT
 
 
 
-century                       =  2 DIGIT
-decade                        =  3 DIGIT
-year                          =  4 DIGIT
-month                         =  '01' / '02' / '03' / '04' / '05' / '06' / '07' / '08' / '09' / '10' / '11' / '12'
-week                          =  2 DIGIT ; actually 01 - 53
-weekday                       =  '1' / '2' / '3' / '4' / '5' / '6' / '7'
-day-of-year                   =  3 DIGIT ; actually 001 - 366
-day                           =  2 DIGIT
-hour                          =  2 DIGIT ; actually 00 - 23
-minute                        =  2 DIGIT ; actually 00 - 59
-second                        =  2 DIGIT ; actually 00 - 60
-grouping                      =  '21' / '22' / '23' / '24' / '25' / '26' / '27' / '28' / '29' / '30'
-grouping                      =/ '31' / '32' / '33' / '34' / '35' / '36' / '37' / '38' / '39' / '40' / '41'
+century                       =  [qualifier] 2 DIGIT
+decade                        =  [qualifier] 3 DIGIT
+year                          =  [qualifier] 4 DIGIT
+month                         =  [qualifier] ('01' / '02' / '03' / '04' / '05' / '06' / '07' / '08' / '09' / '10' / '11' / '12')
+week                          =  [qualifier] 'W' 2 DIGIT ; actually 01 - 53
+weekday                       =  [qualifier] ('1' / '2' / '3' / '4' / '5' / '6' / '7')
+day-of-year                   =  [qualifier] 3 DIGIT ; actually 001 - 366
+day                           =  [qualifier] 2 DIGIT
+hour                          =  [qualifier] 2 DIGIT ; actually 00 - 23
+minute                        =  [qualifier] 2 DIGIT ; actually 00 - 59
+second                        =  [qualifier] 2 DIGIT ; actually 00 - 60
+<grouping-value>              =  '21' / '22' / '23' / '24' / '25' / '26' / '27' / '28' / '29' / '30'
+<grouping-value>              =/ '31' / '32' / '33' / '34' / '35' / '36' / '37' / '38' / '39' / '40' / '41'
+grouping                      =  [qualifier] grouping-value
 
-century-e                     =  1* DIGIT <'C'>
-decade-e                      =  1* DIGIT <'J'>
-year-e                        =  [minus] 1* DIGIT <'Y'>
-month-e                       =  * '0' ('1' / '2' / '3' / '4' / '5' / '6' / '7' / '8' / '9' / '10' / '11' / '12') <'M'>
-week-e                        =  1* DIGIT <'W'>
-weekday-e                     =  * '0' ('1' / '2' / '3' / '4' / '5' / '6' / '7') <'K'>
-day-of-year-e                 =  1* DIGIT <'O'>
-day-e                         =  1* DIGIT <'D'>
-hour-e                        =  1* DIGIT <'H'>
-minute-e                      =  1* DIGIT <'M'>
-second-e                      =  1* DIGIT <'S'>
-hour-e-fraction               =  1* DIGIT fraction <'H'>
-minute-e-fraction             =  1* DIGIT fraction <'M'>
-second-e-fraction             =  1* DIGIT fraction <'S'>
-hour-e-0                      =  ''
-minute-e-0                    =  ''
-grouping-e                    =  * '0' grouping <'A'>
+century-expanded              =  [qualifier] 2* DIGIT ; assuming expansion by 0 digits
+decade-expanded               =  [qualifier] 3* DIGIT ; assuming expansion by 0 digits
+year-expanded                 =  [qualifier] 4* DIGIT ; assuming expansion by 0 digits
 
-century-expanded              =  2* DIGIT ; assuming expansion by 0 digits
-decade-expanded               =  3* DIGIT ; assuming expansion by 0 digits
-year-expanded                 =  4* DIGIT ; assuming expansion by 0 digits
+century-e                     =  1* DIGIT [qualifier] <'C'>
+decade-e                      =  1* DIGIT [qualifier] <'J'>
+year-e                        =  [minus] 1* DIGIT [qualifier] <'Y'>
+month-e                       =  * '0' ('1' / '2' / '3' / '4' / '5' / '6' / '7' / '8' / '9' / '10' / '11' / '12') [qualifier] <'M'>
+week-e                        =  1* DIGIT [qualifier] <'W'>
+weekday-e                     =  * '0' ('1' / '2' / '3' / '4' / '5' / '6' / '7') [qualifier] <'K'>
+day-of-year-e                 =  1* DIGIT [qualifier] <'O'>
+day-e                         =  1* DIGIT [qualifier] <'D'>
+hour-e                        =  1* DIGIT [qualifier] <'H'>
+minute-e                      =  1* DIGIT [qualifier] <'M'>
+second-e                      =  1* DIGIT [qualifier] <'S'>
+hour-e-fraction               =  1* DIGIT fraction [qualifier] <'H'>
+minute-e-fraction             =  1* DIGIT fraction [qualifier] <'M'>
+second-e-fraction             =  1* DIGIT fraction [qualifier] <'S'>
+grouping-e                    =  * '0' grouping-value [qualifier] <'A'>
+
 years                         =  1* DIGIT
 months                        =  1* DIGIT
 weeks                         =  1* DIGIT

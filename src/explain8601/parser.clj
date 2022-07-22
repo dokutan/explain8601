@@ -4,6 +4,7 @@
 (def parse-8601
   (insta/parser
    (clojure.java.io/resource "8601.abnf")
+   :output-format :hiccup ; :hiccup or :enlive
    :input-format :abnf))
 
 (defn parse-all-8601
