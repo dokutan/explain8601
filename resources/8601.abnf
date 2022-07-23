@@ -1,5 +1,5 @@
 expression                    =  date-time-expression / set / set-single
-<date-time-expression>        =  date / date-e / time / time-e / date-time / date-time-e / timezone / timezone-e / interval / interval-e / duration / recurring-interval
+<date-time-expression>        =  date / date-e / date-year / time / time-e / date-time / date-time-e / timezone / timezone-e / interval / interval-e / duration / recurring-interval
 
 
 ;; set expressions
@@ -14,14 +14,14 @@ date-tail                     =  calendar-date-tail / week-date-tail / ordinal-d
 
 ; calendar dates
 calendar-date                 =  calendar-date-day / calendar-date-month / calendar-date-grouping / calendar-date-year / calendar-date-decade / calendar-date-century
-  <calendar-date-day>         =  (year month day) / (year [qualifier] '-' month [qualifier] '-' day [qualifier]) / (pm year-expanded month day) / (pm year-expanded [qualifier] '-' month [qualifier] '-' day [qualifier])
-  <calendar-date-month>       =  (year [qualifier] '-' month [qualifier]) / (pm year-expanded [qualifier] '-' month [qualifier])
-  <calendar-date-grouping>    =  (year [qualifier] '-' grouping [qualifier]) / (pm year-expanded [qualifier] '-' grouping [qualifier])
-  <calendar-date-year>        =  (year [qualifier]) / (pm year-expanded [qualifier])
-  <calendar-date-decade>      =  (decade [qualifier]) / (pm decade-expanded [qualifier])
-  <calendar-date-century>     =  (century [qualifier]) / (pm century-expanded [qualifier])
+  <calendar-date-day>         =  (year month day) / (year [qualifier] <'-'> month [qualifier] <'-'> day [qualifier]) / (year-expanded month day) / (year-expanded [qualifier] <'-'> month [qualifier] <'-'> day [qualifier])
+  <calendar-date-month>       =  (year [qualifier] <'-'> month [qualifier]) / (year-expanded [qualifier] <'-'> month [qualifier])
+  <calendar-date-grouping>    =  (year [qualifier] <'-'> grouping [qualifier]) / (year-expanded [qualifier] <'-'> grouping [qualifier])
+  <calendar-date-year>        =  (year [qualifier]) / (year-expanded [qualifier])
+  <calendar-date-decade>      =  (decade [qualifier]) / (decade-expanded [qualifier])
+  <calendar-date-century>     =  (century [qualifier]) / (century-expanded [qualifier])
 calendar-date-tail            =  calendar-date-tail-day / calendar-date-tail-month
-  calendar-date-tail-day      =  ([month [qualifier] '-'] day [qualifier]) / ([month] day)
+  calendar-date-tail-day      =  ([month [qualifier] <'-'>] day [qualifier]) / ([month] day)
   calendar-date-tail-month    =  month [qualifier]
 
 ; calendar dates (explicit form)
@@ -39,10 +39,10 @@ calendar-date-tail-e          =  calendar-date-tail-day-e / calendar-date-tail-m
 
 ; week dates
 week-date                     =  week-date-day / week-date-week
-  <week-date-day>             =  (year week weekday) / (year [qualifier] '-' week [qualifier] '-' weekday [qualifier]) / (pm year-expanded week weekday) / (pm year-expanded [qualifier] '-' week [qualifier] '-' weekday [qualifier])
-  <week-date-week>            =  (year [[qualifier] '-'] week [qualifier]) / (pm year-expanded [[qualifier] '-'] week [qualifier])
+  <week-date-day>             =  (year week weekday) / (year [qualifier] <'-'> week [qualifier] <'-'> weekday [qualifier]) / (year-expanded week weekday) / (year-expanded [qualifier] <'-'> week [qualifier] <'-'> weekday [qualifier])
+  <week-date-week>            =  (year [[qualifier] <'-'>] week [qualifier]) / (year-expanded [[qualifier] <'-'>] week [qualifier])
 week-date-tail                =  week-date-tail-day / week-date-tail-week
-  week-date-tail-day          =  ([week [qualifier] '-'] weekday [qualifier]) / ([week] weekday)
+  week-date-tail-day          =  ([week [qualifier] <'-'>] weekday [qualifier]) / ([week] weekday)
   week-date-tail-week         =  week [qualifier]
 
 ; week dates (explicit form)
@@ -55,12 +55,20 @@ week-date-tail-e              =  week-date-tail-day-e / week-date-tail-week-e
 
 
 ; ordinal dates
-ordinal-date                  =  (year [[qualifier] '-'] day-of-year) / (pm year-expanded [[qualifier] '-'] day-of-year)
+ordinal-date                  =  (year [[qualifier] <'-'>] day-of-year) / (year-expanded [[qualifier] <'-'>] day-of-year)
 ordinal-date-tail             =  day-of-year [qualifier]
 
 ; ordinal dates (explicit form)
 ordinal-date-e                =  year-e [qualifier] day-of-year-e [qualifier] [timezone-e]
 ordinal-date-tail-e           =  day-of-year-e [qualifier] [timezone-e]
+
+
+; special year forms
+date-year                     =  4 DIGIT [significant-digits]
+date-year                     =/ <'Y'> [minus] 5* DIGITX [significant-digits]
+date-year                     =/ <'Y'> [minus] 1* DIGIT exponent [significant-digits]
+exponent                      =  <'E'> 1* DIGIT
+significant-digits            =  <'S'> 1* DIGIT
 
 
 ;; time
@@ -73,11 +81,11 @@ time-tail                     =  time-tail-minute / time-tail-second
   <time-tail-second>          =  normal-time-tail-second [fraction] [timezone]
 
 <normal-time>                 =  normal-time-second / normal-time-minute / hour
-<normal-time-second>          =  (hour [qualifier] ':' minute [qualifier] ':' second [qualifier]) / (hour minute second)
-<normal-time-minute>          =  (hour [qualifier] ':' minute [qualifier]) / (hour minute)
+<normal-time-second>          =  (hour [qualifier] <':'> minute [qualifier] <':'> second [qualifier]) / (hour minute second)
+<normal-time-minute>          =  (hour [qualifier] <':'> minute [qualifier]) / (hour minute)
 
-<normal-time-tail-second>     =  ([hour [qualifier] ':' [minute [qualifier] ':']] second [qualifier]) / ([hour [minute]] second)
-<normal-time-tail-minute>     =  ([hour [qualifier] ':'] minute) / (hour minute)
+<normal-time-tail-second>     =  ([hour [qualifier] <':'> [minute [qualifier] <':'>]] second [qualifier]) / ([hour [minute]] second)
+<normal-time-tail-minute>     =  ([hour [qualifier] <':'>] minute) / (hour minute)
 
 ;; time (explicit form)
 time-e                        =  time-second-e / time-minute-e / time-hour-e
@@ -90,19 +98,23 @@ time-e                        =  time-second-e / time-minute-e / time-hour-e
 
 
 ;; time zone designator
-timezone                      =  'Z' / (pm hour [[':'] minute])
+timezone                      =  'Z' / (pm hour [[<':'>] minute])
 
 ;; time zone designator (explicit form)
 timezone-e                    =  'Z' [[minus] time-e]
 
 
 ;; date + time
-date-time                     =  date-day 'T' time
-  <date-day>                  =  calendar-date-day / week-date-day / ordinal-date
+date-time                     =  calendar-date-time / week-date-time / ordinal-date-time
+calendar-date-time            =  calendar-date-day <'T'> time
+week-date-time                =  week-date-day <'T'> time
+ordinal-date-time             =  ordinal-date <'T'> time
 
 ;; date + time (explicit form)
-date-time-e                   =  date-day-e time-e
-  <date-day-e>                =  calendar-date-day-e / week-date-day-e / ordinal-date-e
+date-time-e                   =  calendar-date-time-e / week-date-time-e / ordinal-date-time-e
+calendar-date-time-e          =  calendar-date-day-e time-e
+week-date-time-e              =  week-date-day-e time-e
+ordinal-date-time-e           =  ordinal-date-e time-e
 
 
 ;; duration
@@ -215,41 +227,42 @@ repetitions                   =  '-1' / * DIGIT
 
 
 
-century                       =  [qualifier] 2 DIGIT
-decade                        =  [qualifier] 3 DIGIT
-year                          =  [qualifier] 4 DIGIT
-month                         =  [qualifier] ('01' / '02' / '03' / '04' / '05' / '06' / '07' / '08' / '09' / '10' / '11' / '12')
-week                          =  [qualifier] 'W' 2 DIGIT ; actually 01 - 53
-weekday                       =  [qualifier] ('1' / '2' / '3' / '4' / '5' / '6' / '7')
-day-of-year                   =  [qualifier] 3 DIGIT ; actually 001 - 366
-day                           =  [qualifier] 2 DIGIT
-hour                          =  [qualifier] 2 DIGIT ; actually 00 - 23
-minute                        =  [qualifier] 2 DIGIT ; actually 00 - 59
-second                        =  [qualifier] 2 DIGIT ; actually 00 - 60
-<grouping-value>              =  '21' / '22' / '23' / '24' / '25' / '26' / '27' / '28' / '29' / '30'
-<grouping-value>              =/ '31' / '32' / '33' / '34' / '35' / '36' / '37' / '38' / '39' / '40' / '41'
+century                       =  [qualifier] 2 DIGITX
+decade                        =  [qualifier] 3 DIGITX
+year                          =  [qualifier] 4 DIGITX
+month                         =  [qualifier] 2 DIGITX
+week                          =  [qualifier] <'W'> 2 DIGITX ; actually 00 - 53
+weekday                       =  [qualifier] ('1' / '2' / '3' / '4' / '5' / '6' / '7' / 'X')
+day-of-year                   =  [qualifier] 3 DIGITX ; actually 001 - 366
+day                           =  [qualifier] 2 DIGITX
+hour                          =  [qualifier] 2 DIGITX ; actually 00 - 23
+minute                        =  [qualifier] 2 DIGITX ; actually 00 - 59
+second                        =  [qualifier] 2 DIGITX ; actually 00 - 60
 grouping                      =  [qualifier] grouping-value
 
-century-expanded              =  [qualifier] 2* DIGIT ; assuming expansion by 0 digits
-decade-expanded               =  [qualifier] 3* DIGIT ; assuming expansion by 0 digits
-year-expanded                 =  [qualifier] 4* DIGIT ; assuming expansion by 0 digits
+century-expanded              =  [qualifier] pm 2* DIGITX ; assuming expansion by 0 digits
+decade-expanded               =  [qualifier] pm 3* DIGITX ; assuming expansion by 0 digits
+year-expanded                 =  [qualifier] pm 4* DIGITX ; assuming expansion by 0 digits
 
-century-e                     =  1* DIGIT [qualifier] <'C'>
-decade-e                      =  1* DIGIT [qualifier] <'J'>
-year-e                        =  [minus] 1* DIGIT [qualifier] <'Y'>
-month-e                       =  * '0' ('1' / '2' / '3' / '4' / '5' / '6' / '7' / '8' / '9' / '10' / '11' / '12') [qualifier] <'M'>
-week-e                        =  1* DIGIT [qualifier] <'W'>
-weekday-e                     =  * '0' ('1' / '2' / '3' / '4' / '5' / '6' / '7') [qualifier] <'K'>
-day-of-year-e                 =  1* DIGIT [qualifier] <'O'>
-day-e                         =  1* DIGIT [qualifier] <'D'>
-hour-e                        =  1* DIGIT [qualifier] <'H'>
-minute-e                      =  1* DIGIT [qualifier] <'M'>
-second-e                      =  1* DIGIT [qualifier] <'S'>
-hour-e-fraction               =  1* DIGIT fraction [qualifier] <'H'>
-minute-e-fraction             =  1* DIGIT fraction [qualifier] <'M'>
-second-e-fraction             =  1* DIGIT fraction [qualifier] <'S'>
+century-e                     =  [minus] (1* DIGITX / unspecified-value) [qualifier] <'C'>
+decade-e                      =  [minus] (1* DIGITX / unspecified-value) [qualifier] <'J'>
+year-e                        =  [minus] (1* DIGITX / unspecified-value) [qualifier] <'Y'>
+month-e                       =  (1* DIGITX / unspecified-value) [qualifier] <'M'>
+week-e                        =  (1* DIGITX / unspecified-value) [qualifier] <'W'>
+weekday-e                     =  ((* '0' ('1' / '2' / '3' / '4' / '5' / '6' / '7' / 'X')) / unspecified-value) [qualifier] <'K'>
+day-of-year-e                 =  (1* DIGITX / unspecified-value) [qualifier] <'O'>
+day-e                         =  (1* DIGITX / unspecified-value) [qualifier] <'D'>
+hour-e                        =  (1* DIGITX / unspecified-value) [qualifier] <'H'>
+minute-e                      =  (1* DIGITX / unspecified-value) [qualifier] <'M'>
+second-e                      =  (1* DIGITX / unspecified-value) [qualifier] <'S'>
+hour-e-fraction               =  (1* DIGITX / unspecified-value) fraction [qualifier] <'H'>
+minute-e-fraction             =  (1* DIGITX / unspecified-value) fraction [qualifier] <'M'>
+second-e-fraction             =  (1* DIGITX / unspecified-value) fraction [qualifier] <'S'>
 grouping-e                    =  * '0' grouping-value [qualifier] <'A'>
 
+DIGITX                        =  '0' / '1' / '2' / '3' / '4' / '5' / '6' / '7' / '8' / '9' / 'X'
+<grouping-value>              =  '21' / '22' / '23' / '24' / '25' / '26' / '27' / '28' / '29' / '30'
+<grouping-value>              =/ '31' / '32' / '33' / '34' / '35' / '36' / '37' / '38' / '39' / '40' / '41'
 years                         =  1* DIGIT
 months                        =  1* DIGIT
 weeks                         =  1* DIGIT
@@ -265,3 +278,4 @@ solidus                       =  '/' / '--'
 interval-limit-open           =  '..'
 interval-limit-unknown        =  ''
 qualifier                     =  '~' / '?' / '%'
+unspecified-value             =  'X*'
