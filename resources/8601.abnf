@@ -73,9 +73,9 @@ significant-digits            =  <'S'> 1* DIGIT
 
 ;; time
 time                          =  time-second / time-minute / time-hour
-  <time-second>               =  ['T'] normal-time-second [fraction] [timezone]
-  <time-minute>               =  ['T'] normal-time-minute [fraction] [timezone]
-  <time-hour>                 =  ['T'] hour [fraction] [timezone]
+  <time-second>               =  [<'T'>] normal-time-second [fraction] [timezone]
+  <time-minute>               =  [<'T'>] normal-time-minute [fraction] [timezone]
+  <time-hour>                 =  [<'T'>] hour [fraction] [timezone]
 time-tail                     =  time-tail-minute / time-tail-second
   <time-tail-minute>          =  normal-time-tail-minute [fraction] [timezone]
   <time-tail-second>          =  normal-time-tail-second [fraction] [timezone]
@@ -89,9 +89,9 @@ time-tail                     =  time-tail-minute / time-tail-second
 
 ;; time (explicit form)
 time-e                        =  time-second-e / time-minute-e / time-hour-e
-  <time-second-e>             =  ['T'] [hour-e [qualifier]] [minute-e [qualifier]] (second-e / second-e-fraction) [qualifier] [timezone-e]
-  <time-minute-e>             =  ['T'] [hour-e [qualifier]] (minute-e / minute-e-fraction) [qualifier] [timezone-e]
-  <time-hour-e>               =  ['T'] (hour-e / hour-e-fraction) [qualifier] [timezone-e]
+  <time-second-e>             =  [<'T'>] [hour-e [qualifier]] [minute-e [qualifier]] (second-e / second-e-fraction) [qualifier] [timezone-e]
+  <time-minute-e>             =  [<'T'>] [hour-e [qualifier]] (minute-e / minute-e-fraction) [qualifier] [timezone-e]
+  <time-hour-e>               =  [<'T'>] (hour-e / hour-e-fraction) [qualifier] [timezone-e]
   <time-tail-hour-e>          =  time-hour-e
   <time-tail-minute-e>        =  time-minute-e
   <time-tail-second-e>        =  time-second-e
@@ -118,13 +118,15 @@ ordinal-date-time-e           =  ordinal-date-e time-e
 
 
 ;; duration
-duration                      =  duration-complete / duration-alternative
-duration                      =/ 'P' [years 'Y'] [months 'M'] [days 'D'] ['T'  [hours 'H']  [minutes 'M']  [seconds 'S']]
-  <duration-complete>         =  'P' years 'Y' months 'M' days 'D' 'T' hours 'H' minutes 'M' seconds 'S'
-  <duration-complete>         =/ 'P' weeks 'W'
-  <duration-alternative>      =  'P' calendar-date
-  <duration-alternative>      =/ 'P' calendar-date-day 'T' normal-time
-  <duration-alternative>      =/ 'P' ordinal-date ['T' normal-time]
+duration                      =  duration-complete / duration-alternative / duration-precedence
+duration                      =/ [minus] <'P'> [years <'Y'>] [months <'M'>] [days <'D'>] [<'T'> [hours <'H'>] [minutes <'M'>] [seconds <'S'>]]
+  <duration-complete>         =  [minus] <'P'> years <'Y'> months <'M'> days <'D'> <'T'> hours <'H'> minutes <'M'> seconds <'S'>
+  <duration-complete>         =/ [minus] <'P'> weeks <'W'>
+  <duration-alternative>      =  [minus] <'P'> calendar-date
+  <duration-alternative>      =/ [minus] <'P'> calendar-date-day <'T'> normal-time
+  <duration-alternative>      =/ [minus] <'P'> ordinal-date [<'T'> normal-time]
+  <duration-precedence>       =  [minus] 2* duration-component
+  <duration-component>        =  <'P'> ([years <'Y'>] / [months <'M'>] / [weeks <'W'>] / [days <'D'>] / [<'T'> hours <'H'>] / [<'T'> minutes <'M'>]  [<'T'> seconds <'S'>])
 
 
 ;; interval
@@ -263,14 +265,14 @@ grouping-e                    =  * '0' grouping-value [qualifier] <'A'>
 DIGITX                        =  '0' / '1' / '2' / '3' / '4' / '5' / '6' / '7' / '8' / '9' / 'X'
 <grouping-value>              =  '21' / '22' / '23' / '24' / '25' / '26' / '27' / '28' / '29' / '30'
 <grouping-value>              =/ '31' / '32' / '33' / '34' / '35' / '36' / '37' / '38' / '39' / '40' / '41'
-years                         =  1* DIGIT
-months                        =  1* DIGIT
-weeks                         =  1* DIGIT
-days                          =  1* DIGIT
-hours                         =  1* DIGIT
-minutes                       =  1* DIGIT
-seconds                       =  1* DIGIT
-fraction                      =  ('.' / ',') 1* DIGIT
+years                         =  [minus] 1* DIGIT [fraction]
+months                        =  [minus] 1* DIGIT [fraction]
+weeks                         =  [minus] 1* DIGIT [fraction]
+days                          =  [minus] 1* DIGIT [fraction]
+hours                         =  [minus] 1* DIGIT [fraction]
+minutes                       =  [minus] 1* DIGIT [fraction]
+seconds                       =  [minus] 1* DIGIT [fraction]
+<fraction>                    =  ('.' / ',') 1* DIGIT
 pm                            =  '+' / '-' / %x2212
 minus                         =  '-' / %x2212
 solidus                       =  '/' / '--'

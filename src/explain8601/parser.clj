@@ -1,6 +1,7 @@
 (ns explain8601.parser
   (:require [instaparse.core :as insta]
-            [clojure.string :as string]))
+            [clojure.string :as string]
+            [clojure.set :as set]))
 
 (defn- triml0
   "Remove leading zeros from `str`, ignoring a leading minus."
@@ -56,6 +57,16 @@
     "%" [:qualifier #{:uncertain :approximate}]
     [:qualifier #{}]))
 
+(defn- parse-duration
+  "Parse a :duration node"
+  [& c]
+  (let [minus (first c)
+        c (if (vector? minus)
+            (rest c)
+            c)]
+    [:duration {:components (vec c)
+                :reverse (vector? minus)}]))
+
 (defn- parse-component
   "Generic function for parsing components like year, month, …"
   [kw]
@@ -73,14 +84,41 @@
          :qualifier qualifier}
         {kw value}))))
 
+(defn- move-qualifier
+  "Apply free qualifiers to components"
+  [kw]
+  (fn [& c]
+    (loop [c (reverse c)
+           qualifier nil
+           return []]
+      (if (> (count c) 0)
+        (if (and (vector? (first c))
+                 (= :qualifier (first (first c))))
+          (recur (rest c)
+                 (set/union qualifier (second (first c)))
+                 return)
+          (recur (rest c)
+                 qualifier
+                 (conj
+                  return
+                  (if (nil? qualifier)
+                    (first c)
+                    (assoc
+                     (first c)
+                     :qualifier
+                     (set/union (get (first c) :qualifier) qualifier))))))
+        (reverse (conj return kw))))))
+
 (defn parse-all-8601
   [string]
   (insta/transform
-   {:DIGIT identity
+   {:expression identity
+    :DIGIT identity
     :DIGITX identity
     ;:date-time (fix-date-time-right-qualifier :date-time)
     :date-year parse-date-year
     :qualifier parse-qualifier
+    :duration parse-duration
     :grouping (parse-component :grouping)
     :grouping-e (parse-component :grouping)
     :year (parse-component :year)
@@ -100,5 +138,19 @@
     :minute (parse-component :minute)
     :minute-e (parse-component :minute)
     :second (parse-component :second)
-    :second-e (parse-component :second)}
+    :second-e (parse-component :second)
+    :years (parse-component :years)
+    :months (parse-component :months)
+    :weeks (parse-component :weeks)
+    :days (parse-component :days)
+    :hours (parse-component :hours)
+    :minutes (parse-component :minutes)
+    :seconds (parse-component :seconds)
+    :calendar-date (move-qualifier :calendar-date)
+    :calendar-date-e (move-qualifier :calendar-date)
+    :week-date (move-qualifier :week-date)
+    :week-date-e (move-qualifier :week-date)
+    :ordinal-date (move-qualifier :ordinal-date)
+    :ordinal-date-e (move-qualifier :ordinal-date)
+    :week-date-time-e (move-qualifier :week-date-time-e)}
    (insta/parses parse-8601 string)))
