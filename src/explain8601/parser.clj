@@ -6,7 +6,10 @@
 (defn- triml0
   "Remove leading zeros from `str`, ignoring a leading minus."
   [str]
-  (string/replace str #"^(-)?0*" "$1"))
+  (let [r (string/replace str #"^(-)?0*" "$1")]
+    (if (empty? r)
+      "0"
+      r)))
 
 (def ^:private flattenv (comp vec flatten))
 
@@ -71,28 +74,55 @@
 
 (defn- parse-interval-limit
   "Parse the start or end of an interval"
-  [limit]
-  (cond
-    (and (vector? limit) (= :interval-limit-unknown (first (first limit))))
-    :unknown
+  [limit type-hint]
+  (let [value (cond
+                (and (vector? limit)
+                     (= :interval-limit-unknown (ffirst limit)))
+                :unknown
 
-    (and (vector? limit) (= :interval-limit-open (first (first limit))))
-    :open
+                (and (vector? limit)
+                     (= :interval-limit-open (ffirst limit)))
+                :open
 
-    (and (= :calendar-date (first (first limit)))
-         (= :time (first (second limit))))
-    (flattenv [:calendar-date-time (filter map? (flatten limit))])
+                (and (= :calendar-date (ffirst limit))
+                     (or (= :time (first (second limit)))
+                         (pos? (count (filter map? limit)))))
+                (flattenv [:calendar-date-time (filter map? (flatten limit))])
 
-    (and (= :week-date (first (first limit)))
-         (= :time (first (second limit))))
-    (flattenv [:week-date-time (filter map? (flatten limit))])
+                (and (= :week-date (ffirst limit))
+                     (or (= :time (first (second limit)))
+                         (pos? (count (filter map? limit)))))
+                (flattenv [:week-date-time (filter map? (flatten limit))])
 
-    (and (= :ordinal-date (first (first limit)))
-         (= :time (first (second limit))))
-    (flattenv [:ordinal-date-time (filter map? (flatten limit))])
+                (and (= :ordinal-date (ffirst limit))
+                     (or (= :time (first (second limit)))
+                         (pos? (count (filter map? limit)))))
+                (flattenv [:ordinal-date-time (filter map? (flatten limit))])
 
-    :else
-    limit))
+                (or (= :calendar-date-tail (ffirst limit))
+                    (= :week-date-tail (ffirst limit))
+                    (= :ordinal-date-tail (ffirst limit)))
+                (flattenv [(filter map? (flatten limit))])
+
+                :else
+                limit)]
+    {(if (= :duration (first value))
+       :duration
+       type-hint)
+     value}))
+
+(defn- copy-missing-values
+  "Copy missing values in an interval end from the interval start"
+  [start end]
+  (if (and (get end :end)
+           (get start :start)
+           (map? (first (get end :end))))
+    (let [end (get end :end)
+          start (get start :start)
+          end-keys (apply merge (map (fn [e] {(set (keys e)) e}) (filter map? end)))
+          start-keys (apply merge (map (fn [e] {(set (keys e)) e}) (filter map? start)))]
+      {:end (vec (concat [(first start)] (vals (merge start-keys end-keys))))})
+    end))
 
 (defn- parse-interval
   "Parse a :duration node"
@@ -103,9 +133,11 @@
          c c]
     (cond
       (zero? (count c))
-      [:interval
-       {:start (parse-interval-limit start)
-        :end (parse-interval-limit end)}]
+      (let [start (parse-interval-limit start :start)
+            end (parse-interval-limit end :end)
+            end (copy-missing-values start end)]
+        [:interval
+         (merge start end)])
 
       (and (vector? (first c)) (= :solidus (first (first c))))
       (recur
@@ -137,7 +169,17 @@
 (defn- parse-timezone
   "Parse a :timezone node"
   [& c]
-  {:timezone :TODO})
+  (cond
+    (and (= 1 (count c)) (=  "Z" (first c)))
+    {:timezone :utc}
+
+    :else
+    {:timezone
+     (if (and (= :pm (ffirst (filter vector? c)))
+              (= "+" (second (first (filter vector? c)))))
+       :plus
+       :minus)
+     :offset (vec (filter map? c))}))
 
 (defn- parse-component
   "Generic function for parsing components like year, month, …"
@@ -289,5 +331,11 @@
     ;:week-date-time (parse-date-time :week-date-time)
     ;:ordinal-date-time (parse-date-time :ordinal-date-time)
     :interval parse-interval
-    :interval-e parse-interval}
+    :interval-e parse-interval
+
+    :calendar-date-time (parse-date-time :calendar-date-time)
+    :week-date-time (parse-date-time :week-date-time)
+    :ordinal-date-time (parse-date-time :ordinal-date-time)
+    :date-time identity
+    :date-time-e identity}
    tree))
