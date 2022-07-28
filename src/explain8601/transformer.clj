@@ -2,6 +2,18 @@
   (:require [instaparse.core :as insta]
             [clojure.string :as string]))
 
+(defn- join-and
+  "Join items using ', ' and ' and '"
+  [items]
+  (let [start (reverse (rest (reverse items)))
+        end (last items)]
+    (if (empty? start)
+      (str end)
+      (str
+       (string/join ", " start)
+       " and "
+       end))))
+
 (defn- transform-date-year
   "Tranform a :date-year node"
   [props]
@@ -18,8 +30,7 @@
   [props]
   (format
    "a duration of %s%s"
-   (string/join
-    ", "
+   (join-and
     (mapv (fn [m]
             (reduce-kv
              (fn [_ k v]

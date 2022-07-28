@@ -14,24 +14,24 @@ date-tail                     =  calendar-date-tail / week-date-tail / ordinal-d
 
 ; calendar dates
 calendar-date                 =  calendar-date-day / calendar-date-month / calendar-date-grouping / calendar-date-year / calendar-date-decade / calendar-date-century
-  <calendar-date-day>         =  (year month day) / (year [qualifier] <'-'> month [qualifier] <'-'> day [qualifier]) / (year-expanded month day) / (year-expanded [qualifier] <'-'> month [qualifier] <'-'> day [qualifier])
-  <calendar-date-month>       =  (year [qualifier] <'-'> month [qualifier]) / (year-expanded [qualifier] <'-'> month [qualifier])
-  <calendar-date-grouping>    =  (year [qualifier] <'-'> grouping [qualifier]) / (year-expanded [qualifier] <'-'> grouping [qualifier])
-  <calendar-date-year>        =  (year [qualifier]) / (year-expanded [qualifier])
-  <calendar-date-decade>      =  (decade [qualifier]) / (decade-expanded [qualifier])
-  <calendar-date-century>     =  (century [qualifier]) / (century-expanded [qualifier])
+  calendar-date-day           =  (year month day) / (year [qualifier] <'-'> month [qualifier] <'-'> day [qualifier]) / (year-expanded month day) / (year-expanded [qualifier] <'-'> month [qualifier] <'-'> day [qualifier])
+  calendar-date-month         =  (year [qualifier] <'-'> month [qualifier]) / (year-expanded [qualifier] <'-'> month [qualifier])
+  calendar-date-grouping      =  (year [qualifier] <'-'> grouping [qualifier]) / (year-expanded [qualifier] <'-'> grouping [qualifier])
+  calendar-date-year          =  (year [qualifier]) / (year-expanded [qualifier])
+  calendar-date-decade        =  (decade [qualifier]) / (decade-expanded [qualifier])
+  calendar-date-century       =  (century [qualifier]) / (century-expanded [qualifier])
 calendar-date-tail            =  calendar-date-tail-day / calendar-date-tail-month
   calendar-date-tail-day      =  ([month [qualifier] <'-'>] day [qualifier]) / ([month] day)
   calendar-date-tail-month    =  month [qualifier]
 
 ; calendar dates (explicit form)
 calendar-date-e               =  calendar-date-day-e / calendar-date-month-e / calendar-date-grouping-e / calendar-date-year-e / calendar-date-decade-e / calendar-date-century-e
-  <calendar-date-day-e>       =  year-e [qualifier] month-e [qualifier] day-e [qualifier] [timezone-e]
-  <calendar-date-month-e>     =  year-e [qualifier] month-e [qualifier] [timezone-e]
-  <calendar-date-grouping-e>  =  year-e [qualifier] grouping-e [qualifier] [timezone-e]
-  <calendar-date-year-e>      =  year-e [qualifier] [timezone-e]
-  <calendar-date-decade-e>    =  decade-e [qualifier] [timezone-e]
-  <calendar-date-century-e>   =  century-e [qualifier] [timezone-e]
+  calendar-date-day-e         =  year-e [qualifier] month-e [qualifier] day-e [qualifier] [timezone-e]
+  calendar-date-month-e       =  year-e [qualifier] month-e [qualifier] [timezone-e]
+  calendar-date-grouping-e    =  year-e [qualifier] grouping-e [qualifier] [timezone-e]
+  calendar-date-year-e        =  year-e [qualifier] [timezone-e]
+  calendar-date-decade-e      =  decade-e [qualifier] [timezone-e]
+  calendar-date-century-e     =  century-e [qualifier] [timezone-e]
 calendar-date-tail-e          =  calendar-date-tail-day-e / calendar-date-tail-month-e
   calendar-date-tail-day-e    =  [month-e [qualifier]] day-e [qualifier] [timezone-e]
   calendar-date-tail-month-e  =  month-e [qualifier] [timezone-e]
@@ -39,16 +39,16 @@ calendar-date-tail-e          =  calendar-date-tail-day-e / calendar-date-tail-m
 
 ; week dates
 week-date                     =  week-date-day / week-date-week
-  <week-date-day>             =  (year week weekday) / (year [qualifier] <'-'> week [qualifier] <'-'> weekday [qualifier]) / (year-expanded week weekday) / (year-expanded [qualifier] <'-'> week [qualifier] <'-'> weekday [qualifier])
-  <week-date-week>            =  (year [[qualifier] <'-'>] week [qualifier]) / (year-expanded [[qualifier] <'-'>] week [qualifier])
+  week-date-day               =  (year week weekday) / (year [qualifier] <'-'> week [qualifier] <'-'> weekday [qualifier]) / (year-expanded week weekday) / (year-expanded [qualifier] <'-'> week [qualifier] <'-'> weekday [qualifier])
+  week-date-week              =  (year [[qualifier] <'-'>] week [qualifier]) / (year-expanded [[qualifier] <'-'>] week [qualifier])
 week-date-tail                =  week-date-tail-day / week-date-tail-week
   week-date-tail-day          =  ([week [qualifier] <'-'>] weekday [qualifier]) / ([week] weekday)
   week-date-tail-week         =  week [qualifier]
 
 ; week dates (explicit form)
 week-date-e                   =  week-date-day-e / week-date-week-e
-  <week-date-day-e>           =  year-e [qualifier] week-e [qualifier] weekday-e [qualifier] [timezone-e]
-  <week-date-week-e>          =  year-e [qualifier] week-e [qualifier] [timezone-e]
+  week-date-day-e             =  year-e [qualifier] week-e [qualifier] weekday-e [qualifier] [timezone-e]
+  week-date-week-e            =  year-e [qualifier] week-e [qualifier] [timezone-e]
 week-date-tail-e              =  week-date-tail-day-e / week-date-tail-week-e
   week-date-tail-day-e        =  [week-e [qualifier]] weekday-e [qualifier] [timezone-e]
   week-date-tail-week-e       =  week-e [qualifier] [timezone-e]
@@ -73,9 +73,9 @@ significant-digits            =  <'S'> 1* DIGIT
 
 ;; time
 time                          =  time-second / time-minute / time-hour
-  <time-second>               =  [<'T'>] normal-time-second [fraction] [timezone]
-  <time-minute>               =  [<'T'>] normal-time-minute [fraction] [timezone]
-  <time-hour>                 =  [<'T'>] hour [fraction] [timezone]
+   time-second                =  [<'T'>] normal-time-second [fraction] [timezone]
+   time-minute                =  [<'T'>] normal-time-minute [fraction] [timezone]
+   time-hour                  =  [<'T'>] hour [fraction] [timezone]
 time-tail                     =  time-tail-minute / time-tail-second
   <time-tail-minute>          =  normal-time-tail-minute [fraction] [timezone]
   <time-tail-second>          =  normal-time-tail-second [fraction] [timezone]
@@ -141,15 +141,15 @@ interval                      =/ calendar-date-day solidus (calendar-date-day / 
 interval                      =/ week-date-week solidus (week-date-week / week-date-tail-week)
 interval                      =/ week-date-day solidus (week-date-day / week-date-tail-day)
 interval                      =/ ordinal-date solidus (ordinal-date / ordinal-date-tail)
-interval                      =/ calendar-date-day 'T' time-second solidus (time-tail-second / ((calendar-date-day / calendar-date-tail-day) 'T' time-second))
-interval                      =/ week-date-day 'T' time-second solidus (time-tail-second / ((week-date-day / week-date-tail-day) 'T' time-second))
-interval                      =/ ordinal-date 'T' time-second solidus (time-tail-second / ((ordinal-date / ordinal-date-tail) 'T' time-second))
-interval                      =/ calendar-date-day 'T' time-minute solidus (time-tail-minute / ((calendar-date-day / calendar-date-tail-day) 'T' time-minute))
-interval                      =/ week-date-day 'T' time-minute solidus (time-tail-minute / ((week-date-day / week-date-tail-day) 'T' time-minute))
-interval                      =/ ordinal-date 'T' time-minute solidus (time-tail-minute / ((ordinal-date / ordinal-date-tail) 'T' time-minute))
-interval                      =/ calendar-date-day 'T' time-hour solidus (hour / ((calendar-date-day / calendar-date-tail-day) 'T' time-hour))
-interval                      =/ week-date-day 'T' time-hour solidus (hour / ((week-date-day / week-date-tail-day) 'T' time-hour))
-interval                      =/ ordinal-date 'T' time-hour solidus (hour / ((ordinal-date / ordinal-date-tail) 'T' time-hour))
+interval                      =/ calendar-date-day <'T'> time-second solidus (time-tail-second / ((calendar-date-day / calendar-date-tail-day) <'T'> time-second))
+interval                      =/ week-date-day <'T'> time-second solidus (time-tail-second / ((week-date-day / week-date-tail-day) <'T'> time-second))
+interval                      =/ ordinal-date <'T'> time-second solidus (time-tail-second / ((ordinal-date / ordinal-date-tail) <'T'> time-second))
+interval                      =/ calendar-date-day <'T'> time-minute solidus (time-tail-minute / ((calendar-date-day / calendar-date-tail-day) <'T'> time-minute))
+interval                      =/ week-date-day <'T'> time-minute solidus (time-tail-minute / ((week-date-day / week-date-tail-day) <'T'> time-minute))
+interval                      =/ ordinal-date <'T'> time-minute solidus (time-tail-minute / ((ordinal-date / ordinal-date-tail) <'T'> time-minute))
+interval                      =/ calendar-date-day <'T'> time-hour solidus (hour / ((calendar-date-day / calendar-date-tail-day) <'T'> time-hour))
+interval                      =/ week-date-day <'T'> time-hour solidus (hour / ((week-date-day / week-date-tail-day) <'T'> time-hour))
+interval                      =/ ordinal-date <'T'> time-hour solidus (hour / ((ordinal-date / ordinal-date-tail) <'T'> time-hour))
 
 interval                      =/ calendar-date-century solidus interval-limit
 interval                      =/ calendar-date-decade solidus interval-limit
@@ -159,9 +159,9 @@ interval                      =/ calendar-date-day solidus interval-limit
 interval                      =/ week-date-week solidus interval-limit
 interval                      =/ week-date-day solidus interval-limit
 interval                      =/ ordinal-date solidus interval-limit
-interval                      =/ calendar-date-day 'T' time solidus interval-limit
-interval                      =/ week-date-day 'T' time solidus interval-limit
-interval                      =/ ordinal-date 'T' time solidus interval-limit
+interval                      =/ calendar-date-day <'T'> time solidus interval-limit
+interval                      =/ week-date-day <'T'> time solidus interval-limit
+interval                      =/ ordinal-date <'T'> time solidus interval-limit
 
 interval                      =/ interval-limit solidus calendar-date-century
 interval                      =/ interval-limit solidus calendar-date-decade
@@ -187,15 +187,15 @@ interval-e                    =/ calendar-date-day-e solidus (calendar-date-day-
 interval-e                    =/ week-date-week-e solidus (week-date-week-e / week-date-tail-week-e)
 interval-e                    =/ week-date-day-e solidus (week-date-day-e / week-date-tail-day-e)
 interval-e                    =/ ordinal-date-e solidus (ordinal-date-e / ordinal-date-tail-e)
-interval-e                    =/ calendar-date-day-e 'T' time-second-e solidus (time-tail-second-e / ((calendar-date-day-e / calendar-date-tail-day-e) 'T' time-second-e))
-interval-e                    =/ week-date-day-e 'T' time-second-e solidus (time-tail-second-e / ((week-date-day-e / week-date-tail-day-e) 'T' time-second-e))
-interval-e                    =/ ordinal-date-e 'T' time-second-e solidus (time-tail-second-e / ((ordinal-date-e / ordinal-date-tail-e) 'T' time-second-e))
-interval-e                    =/ calendar-date-day-e 'T' time-minute-e solidus (time-tail-minute-e / ((calendar-date-day-e / calendar-date-tail-day-e) 'T' time-minute-e))
-interval-e                    =/ week-date-day-e 'T' time-minute-e solidus (time-tail-minute-e / ((week-date-day-e / week-date-tail-day-e) 'T' time-minute-e))
-interval-e                    =/ ordinal-date-e 'T' time-minute-e solidus (time-tail-minute-e / ((ordinal-date-e / ordinal-date-tail-e) 'T' time-minute-e))
-interval-e                    =/ calendar-date-day-e 'T' time-hour-e solidus (time-tail-hour-e / ((calendar-date-day-e / calendar-date-tail-day-e) 'T' time-hour-e))
-interval-e                    =/ week-date-day-e 'T' time-hour-e solidus (time-tail-hour-e / ((week-date-day-e / week-date-tail-day-e) 'T' time-hour-e))
-interval-e                    =/ ordinal-date-e 'T' time-hour-e solidus (time-tail-hour-e / ((ordinal-date-e / ordinal-date-tail-e) 'T' time-hour-e))
+interval-e                    =/ calendar-date-day-e <'T'> time-second-e solidus (time-tail-second-e / ((calendar-date-day-e / calendar-date-tail-day-e) <'T'> time-second-e))
+interval-e                    =/ week-date-day-e <'T'> time-second-e solidus (time-tail-second-e / ((week-date-day-e / week-date-tail-day-e) <'T'> time-second-e))
+interval-e                    =/ ordinal-date-e <'T'> time-second-e solidus (time-tail-second-e / ((ordinal-date-e / ordinal-date-tail-e) <'T'> time-second-e))
+interval-e                    =/ calendar-date-day-e <'T'> time-minute-e solidus (time-tail-minute-e / ((calendar-date-day-e / calendar-date-tail-day-e) <'T'> time-minute-e))
+interval-e                    =/ week-date-day-e <'T'> time-minute-e solidus (time-tail-minute-e / ((week-date-day-e / week-date-tail-day-e) <'T'> time-minute-e))
+interval-e                    =/ ordinal-date-e <'T'> time-minute-e solidus (time-tail-minute-e / ((ordinal-date-e / ordinal-date-tail-e) <'T'> time-minute-e))
+interval-e                    =/ calendar-date-day-e <'T'> time-hour-e solidus (time-tail-hour-e / ((calendar-date-day-e / calendar-date-tail-day-e) <'T'> time-hour-e))
+interval-e                    =/ week-date-day-e <'T'> time-hour-e solidus (time-tail-hour-e / ((week-date-day-e / week-date-tail-day-e) <'T'> time-hour-e))
+interval-e                    =/ ordinal-date-e <'T'> time-hour-e solidus (time-tail-hour-e / ((ordinal-date-e / ordinal-date-tail-e) <'T'> time-hour-e))
 
 interval-e                    =/ calendar-date-century-e solidus interval-limit
 interval-e                    =/ calendar-date-decade-e solidus interval-limit
@@ -205,9 +205,9 @@ interval-e                    =/ calendar-date-day-e solidus interval-limit
 interval-e                    =/ week-date-week-e solidus interval-limit
 interval-e                    =/ week-date-day-e solidus interval-limit
 interval-e                    =/ ordinal-date-e solidus interval-limit
-interval-e                    =/ calendar-date-day-e 'T' time-e solidus interval-limit
-interval-e                    =/ week-date-day-e 'T' time-e solidus interval-limit
-interval-e                    =/ ordinal-date-e 'T' time-e solidus interval-limit
+interval-e                    =/ calendar-date-day-e <'T'> time-e solidus interval-limit
+interval-e                    =/ week-date-day-e <'T'> time-e solidus interval-limit
+interval-e                    =/ ordinal-date-e <'T'> time-e solidus interval-limit
 
 interval-e                    =/ interval-limit solidus calendar-date-century-e
 interval-e                    =/ interval-limit solidus calendar-date-decade-e

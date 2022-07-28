@@ -8,7 +8,9 @@
   [str]
   (string/replace str #"^(-)?0*" "$1"))
 
-(def parse-8601
+(def ^:private flattenv (comp vec flatten))
+
+(def ^:private parse-8601
   (insta/parser
    (clojure.java.io/resource "8601.abnf")
    :output-format :hiccup ; :hiccup or :enlive
@@ -67,14 +69,90 @@
     [:duration {:components (vec c)
                 :reverse (vector? minus)}]))
 
+(defn- parse-interval-limit
+  "Parse the start or end of an interval"
+  [limit]
+  (cond
+    (and (vector? limit) (= :interval-limit-unknown (first (first limit))))
+    :unknown
+
+    (and (vector? limit) (= :interval-limit-open (first (first limit))))
+    :open
+
+    (and (= :calendar-date (first (first limit)))
+         (= :time (first (second limit))))
+    (flattenv [:calendar-date-time (filter map? (flatten limit))])
+
+    (and (= :week-date (first (first limit)))
+         (= :time (first (second limit))))
+    (flattenv [:week-date-time (filter map? (flatten limit))])
+
+    (and (= :ordinal-date (first (first limit)))
+         (= :time (first (second limit))))
+    (flattenv [:ordinal-date-time (filter map? (flatten limit))])
+
+    :else
+    limit))
+
+(defn- parse-interval
+  "Parse a :duration node"
+  [& c]
+  (loop [start []
+         end []
+         state :start
+         c c]
+    (cond
+      (zero? (count c))
+      [:interval
+       {:start (parse-interval-limit start)
+        :end (parse-interval-limit end)}]
+
+      (and (vector? (first c)) (= :solidus (first (first c))))
+      (recur
+       start
+       end
+       :end
+       (rest c))
+
+      (= :start state)
+      (recur
+       (conj start (first c))
+       end
+       state
+       (rest c))
+
+      :else
+      (recur
+       start
+       (conj end (first c))
+       state
+       (rest c)))))
+
+(defn- parse-date-time
+  "Flatten a date and time expression"
+  [kw]
+  (fn [& c]
+    (flattenv [kw (filter map? (flattenv c))])))
+
+(defn- parse-timezone
+  "Parse a :timezone node"
+  [& c]
+  {:timezone :TODO})
+
 (defn- parse-component
   "Generic function for parsing components like year, month, …"
   [kw]
   (fn [& c]
     (let [c (map
              (fn [n]
-               (if (and (vector? n) (= :minus (first n)))
+               (cond
+                 (and (vector? n) (= :minus (first n)))
                  "-"
+                 (and (vector? n) (= :pm (first n)))
+                 (if (= "+" (second n))
+                   ""
+                   "-")
+                 :else
                  n))
              c)
           qualifier (second (first (filter vector? c)))
@@ -93,7 +171,7 @@
            return []]
       (if (> (count c) 0)
         (if (and (vector? (first c))
-                 (= :qualifier (first (first c))))
+                 (= :qualifier (ffirst c)))
           (recur (rest c)
                  (set/union qualifier (second (first c)))
                  return)
@@ -107,10 +185,16 @@
                      (first c)
                      :qualifier
                      (set/union (get (first c) :qualifier) qualifier))))))
-        (reverse (conj return kw))))))
+        (vec (reverse (conj return kw)))))))
 
-(defn parse-all-8601
+(defn parse-all-8601-1
+  "The first pass of the parser"
   [string]
+  (insta/parses parse-8601 string))
+
+(defn parse-all-8601-2
+  "The second pass of the parser"
+  [tree]
   (insta/transform
    {:expression identity
     :DIGIT identity
@@ -119,12 +203,20 @@
     :date-year parse-date-year
     :qualifier parse-qualifier
     :duration parse-duration
-    :grouping (parse-component :grouping)
-    :grouping-e (parse-component :grouping)
+
+    :century (parse-component :century)
+    :century-e (parse-component :century)
+    :century-expanded (parse-component :century)
+    :decade (parse-component :decade)
+    :decade-e (parse-component :decade)
+    :decade-expanded (parse-component :decade)
     :year (parse-component :year)
     :year-e (parse-component :year)
+    :year-expanded (parse-component :year)
     :month (parse-component :month)
     :month-e (parse-component :month)
+    :grouping (parse-component :grouping)
+    :grouping-e (parse-component :grouping)
     :week (parse-component :week)
     :week-e (parse-component :week)
     :day (parse-component :day)
@@ -146,11 +238,56 @@
     :hours (parse-component :hours)
     :minutes (parse-component :minutes)
     :seconds (parse-component :seconds)
+
+    :timezone parse-timezone
+    :timezone-e parse-timezone
+
+
     :calendar-date (move-qualifier :calendar-date)
     :calendar-date-e (move-qualifier :calendar-date)
+    :calendar-date-day (move-qualifier :calendar-date)
+    :calendar-date-month (move-qualifier :calendar-date)
+    :calendar-date-grouping (move-qualifier :calendar-date)
+    :calendar-date-year (move-qualifier :calendar-date)
+    :calendar-date-decade (move-qualifier :calendar-date)
+    :calendar-date-century (move-qualifier :calendar-date)
+    :calendar-date-day-e (move-qualifier :calendar-date)
+    :calendar-date-month-e (move-qualifier :calendar-date)
+    :calendar-date-grouping-e (move-qualifier :calendar-date)
+    :calendar-date-year-e (move-qualifier :calendar-date)
+    :calendar-date-decade-e (move-qualifier :calendar-date)
+    :calendar-date-century-e (move-qualifier :calendar-date)
     :week-date (move-qualifier :week-date)
     :week-date-e (move-qualifier :week-date)
+    :week-date-day (move-qualifier :week-date)
+    :week-date-week (move-qualifier :week-date)
+    :week-date-day-e (move-qualifier :week-date)
+    :week-date-week-e (move-qualifier :week-date)
     :ordinal-date (move-qualifier :ordinal-date)
     :ordinal-date-e (move-qualifier :ordinal-date)
-    :week-date-time-e (move-qualifier :week-date-time-e)}
-   (insta/parses parse-8601 string)))
+    :calendar-date-time-e (move-qualifier :calendar-date-time)
+    :week-date-time-e (move-qualifier :week-date-time)
+    :ordinal-date-time-e (move-qualifier :ordinal-date-time)
+    :calendar-date-time (move-qualifier :calendar-date-time)
+    :week-date-time (move-qualifier :week-date-time)
+    :ordinal-date-time (move-qualifier :ordinal-date-time)
+    :time (move-qualifier :time)
+    :time-e (move-qualifier :time)
+    :time-hour (move-qualifier :time)
+    :time-hour-e (move-qualifier :time)
+    :time-minute (move-qualifier :time)
+    :time-minute-e (move-qualifier :time)
+    :time-second (move-qualifier :time)
+    :time-second-e (move-qualifier :time)}
+   tree))
+
+(defn parse-all-8601-3
+  "The third pass of the parser"
+  [tree]
+  (insta/transform
+   {;:calendar-date-time (parse-date-time :calendar-date-time)
+    ;:week-date-time (parse-date-time :week-date-time)
+    ;:ordinal-date-time (parse-date-time :ordinal-date-time)
+    :interval parse-interval
+    :interval-e parse-interval}
+   tree))
