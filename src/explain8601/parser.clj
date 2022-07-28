@@ -105,7 +105,7 @@
                 (flattenv [(filter map? (flatten limit))])
 
                 :else
-                limit)]
+                (flattenv limit))]
     {(if (= :duration (first value))
        :duration
        type-hint)
