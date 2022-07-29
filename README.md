@@ -34,7 +34,7 @@ Not all features from ISO 8601-2:2019 are supported, missing are e.g.:
 Expressions are currently not validated, it is therefore easy to produce accepted but invalid expressions.
 
 ## Further information
-https://en.wikipedia.org/wiki/ISO\_8601
+https://en.wikipedia.org/wiki/ISO_8601
 
 freely available related standards:
 - https://www.loc.gov/standards/datetime/

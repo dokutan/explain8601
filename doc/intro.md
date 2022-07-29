@@ -1,3 +1,3 @@
 # Introduction to explain8601
 
-TODO: write [great documentation](http://jacobian.org/writing/what-to-write/)
+See the README for basic documentation. Code documentation can be built with ``lein codox``.
