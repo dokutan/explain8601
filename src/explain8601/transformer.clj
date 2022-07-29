@@ -135,3 +135,21 @@
     :calendar-date transform-calendar-date
     :duration transform-duration}
    tree))
+
+(defn descriptions->description
+  "Convert a sequence of descriptions in to a single string"
+  [descriptions expression]
+  (case (count descriptions)
+    0
+    (format
+     "'%s' does not appear to be a valid expression.\n"
+     expression)
+    1
+    (format
+     "'%s' represents %s.\n"
+     expression
+     (first descriptions))
+    (format
+     "'%s' is ambiguous and could represent one of the following:\n%s"
+     expression
+     (string/join (map (fn [s] (str " • " s "\n")) descriptions)))))

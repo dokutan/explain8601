@@ -31,7 +31,8 @@
             parse-tree-1 (parser/parse-all-8601-1 expression)
             parse-tree-2 (parser/parse-all-8601-2 parse-tree-1)
             parse-tree-3 (parser/parse-all-8601-3 parse-tree-2)
-            descriptions (transformer/transform-8601 parse-tree-3)]
+            descriptions (transformer/transform-8601 parse-tree-3)
+            description (transformer/descriptions->description descriptions expression)]
         (when (:debug (:options opts))
           (zp/czprint expression)
           (println "↓")
@@ -40,5 +41,7 @@
           (zp/czprint parse-tree-2)
           (println "↓")
           (zp/czprint parse-tree-3)
+          (println "↓")
+          (zp/czprint descriptions)
           (println "↓"))
-        (zp/czprint descriptions)))))
+        (print description)))))
