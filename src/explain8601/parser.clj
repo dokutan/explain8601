@@ -42,11 +42,10 @@
                    (Integer/parseInt (second exponent))
                    0)
         sig-digits (last (filter vector? c))
-        sig-digits (if (and (vector? sig-digits)
-                            (= :significant-digits (first sig-digits)))
-                     (Integer/parseInt (second sig-digits))
-                     nil)
-        year (apply str (filter string? c))
+        sig-digits (when (and (vector? sig-digits)
+                              (= :significant-digits (first sig-digits)))
+                     (Integer/parseInt (second sig-digits)))
+        year (string/join (filter string? c))
         year (str sign year (.repeat "0" exponent))
         r (if sig-digits
             {:year year
@@ -172,7 +171,7 @@
         [:interval
          (merge start end)])
 
-      (and (vector? (first c)) (= :solidus (first (first c))))
+      (and (vector? (first c)) (= :solidus (ffirst c)))
       (recur
        start
        end
@@ -207,12 +206,13 @@
     {:timezone :utc}
 
     :else
-    {:timezone
-     (if (and (= :pm (ffirst (filter vector? c)))
-              (= "+" (second (first (filter vector? c)))))
-       :plus
-       :minus)
-     :offset (vec (filter map? c))}))
+    [:timezone
+     {:timezone
+      (if (and (= :pm (ffirst (filter vector? c)))
+               (= "+" (second (first (filter vector? c)))))
+        :plus
+        :minus)
+      :offset (vec (filter map? c))}]))
 
 (defn- parse-component
   "Generic function for parsing components like year, month, …"
@@ -231,11 +231,20 @@
                  n))
              c)
           qualifier (second (first (filter vector? c)))
-          value (triml0 (.replace (apply str (filter string? c)) "." ","))]
+          value (triml0 (.replace (string/join (filter string? c)) "." ","))]
       (if qualifier
         {kw value
          :qualifier qualifier}
         {kw value}))))
+
+(defn- add-start-end
+  "Add :start and :end values"
+  [k digits]
+  (fn [m]
+    (merge
+     m
+     {:start (str (get m k) (.repeat "0" digits))
+      :end   (str (get m k) (.repeat "9" digits))})))
 
 (defn- move-qualifier
   "Apply free qualifiers to components"
@@ -244,7 +253,7 @@
     (loop [c (reverse c)
            qualifier nil
            return []]
-      (if (> (count c) 0)
+      (if (pos? (count c))
         (if (and (vector? (first c))
                  (= :qualifier (ffirst c)))
           (recur (rest c)
@@ -256,10 +265,7 @@
                   return
                   (if (nil? qualifier)
                     (first c)
-                    (assoc
-                     (first c)
-                     :qualifier
-                     (set/union (get (first c) :qualifier) qualifier))))))
+                    (update-in (first c) [:qualifier] set/union qualifier)))))
         (vec (reverse (conj return kw)))))))
 
 (defn parse-all-8601-1
@@ -274,17 +280,17 @@
    {:expression identity
     :DIGIT identity
     :DIGITX identity
-    ;:date-time (fix-date-time-right-qualifier :date-time)
+
     :date-year parse-date-year
     :qualifier parse-qualifier
     :duration parse-duration
 
-    :century (parse-component :century)
-    :century-e (parse-component :century)
-    :century-expanded (parse-component :century)
-    :decade (parse-component :decade)
-    :decade-e (parse-component :decade)
-    :decade-expanded (parse-component :decade)
+    :century (comp (add-start-end :century 2) (parse-component :century))
+    :century-e (comp (add-start-end :century 2) (parse-component :century))
+    :century-expanded (comp (add-start-end :century 2) (parse-component :century))
+    :decade (comp (add-start-end :decade 1) (parse-component :decade))
+    :decade-e (comp (add-start-end :decade 1) (parse-component :decade))
+    :decade-expanded (comp (add-start-end :decade 1) (parse-component :decade))
     :year (parse-component :year)
     :year-e (parse-component :year)
     :year-expanded (parse-component :year)
@@ -319,7 +325,6 @@
 
     :timezone parse-timezone
     :timezone-e parse-timezone
-
 
     :calendar-date (move-qualifier :calendar-date)
     :calendar-date-e (move-qualifier :calendar-date)
@@ -363,15 +368,18 @@
   "The third pass of the parser"
   [tree]
   (insta/transform
-   {;:calendar-date-time (parse-date-time :calendar-date-time)
-    ;:week-date-time (parse-date-time :week-date-time)
-    ;:ordinal-date-time (parse-date-time :ordinal-date-time)
-    :interval parse-interval
+   {:interval parse-interval
     :interval-e parse-interval
 
+    :time (parse-date-time :time)
+    :calendar-date (parse-date-time :calendar-date)
+    :week-date (parse-date-time :week-date)
+    :ordinal-date (parse-date-time :ordinal-date)
     :calendar-date-time (parse-date-time :calendar-date-time)
     :week-date-time (parse-date-time :week-date-time)
     :ordinal-date-time (parse-date-time :ordinal-date-time)
     :date-time identity
-    :date-time-e identity}
+    :date-time-e identity
+    :date identity
+    :date-e identity}
    tree))

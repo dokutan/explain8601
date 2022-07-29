@@ -28,13 +28,13 @@
     (and (contains? qualifiers :uncertain)
          (contains? qualifiers :approximate))
     " (uncertain and approximate)"
-    
+
     (contains? qualifiers :uncertain)
     " (uncertain)"
-    
+
     (contains? qualifiers :approximate)
     " (approximate)"
-    
+
     :else
     ""))
 
@@ -58,6 +58,64 @@
      (get props :year))
     (format "the year %s" (get props :year))))
 
+(defn- transform-grouping
+  "Transform a :grouping value"
+  [grouping]
+  (case grouping
+    "21" "spring"
+    "22" "summer"
+    "23" "autumn"
+    "24" "winter"
+    "25" "spring (northern hemisphere)"
+    "26" "summer (northern hemisphere)"
+    "27" "autumn (northern hemisphere)"
+    "28" "winter (northern hemisphere)"
+    "29" "spring (southern hemisphere)"
+    "30" "summer (southern hemisphere)"
+    "31" "autumn (southern hemisphere)"
+    "32" "winter (southern hemisphere)"
+    "33" "first quarter"
+    "34" "second quarter"
+    "35" "third quarter"
+    "36" "fourth quarter"
+    "37" "first quadrimester"
+    "38" "second quadrimester"
+    "39" "third quadrimester"
+    "40" "first semester"
+    "41" "second semester"
+    (str "grouping " grouping)))
+
+(defn- transform-calendar-date
+  "Transform a :calendar-year node"
+  [& props]
+  (cond
+    (:century (first props))
+    (format
+     "the century from %s to %s%s"
+     (:start (first props))
+     (:end (first props))
+     (transform-qualifier (:qualifier (first props))))
+
+    (:decade (first props))
+    (format
+     "the decade from %s to %s%s"
+     (:start (first props))
+     (:end (first props))
+     (transform-qualifier (:qualifier (first props))))
+
+    (and (:year (first props))
+         (:grouping (second props)))
+    (format
+     "%s%s of %s%s"
+     (transform-grouping (:grouping (second props)))
+     (transform-qualifier (:qualifier (second props)))
+     (:year (first props))
+     (transform-qualifier (:qualifier (first props))))
+
+
+    :else
+    (vec (conj props :calendar-date))))
+
 (defn- transform-duration
   "Tranform a :duration node"
   [props]
@@ -73,5 +131,6 @@
   [tree]
   (insta/transform
    {:date-year transform-date-year
+    :calendar-date transform-calendar-date
     :duration transform-duration}
    tree))
