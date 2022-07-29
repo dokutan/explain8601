@@ -119,9 +119,8 @@ ordinal-date-time-e           =  ordinal-date-e time-e
 
 ;; duration
 duration                      =  duration-complete / duration-alternative / duration-precedence
-duration                      =/ [minus] <'P'> [years <'Y'>] [months <'M'>] [days <'D'>] [<'T'> [hours <'H'>] [minutes <'M'>] [seconds <'S'>]]
+duration                      =/ [minus] <'P'> [years <'Y'>] [months <'M'>] [weeks <'W'>] [days <'D'>] [<'T'> [hours <'H'>] [minutes <'M'>] [seconds <'S'>]]
   <duration-complete>         =  [minus] <'P'> years <'Y'> months <'M'> days <'D'> <'T'> hours <'H'> minutes <'M'> seconds <'S'>
-  <duration-complete>         =/ [minus] <'P'> weeks <'W'>
   <duration-alternative>      =  [minus] <'P'> calendar-date
   <duration-alternative>      =/ [minus] <'P'> calendar-date-day <'T'> normal-time
   <duration-alternative>      =/ [minus] <'P'> ordinal-date [<'T'> normal-time]

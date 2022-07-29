@@ -17,7 +17,8 @@
 (defn- make-singular
   "Remove trailing 's' from `str` if `i` = 1"
   [str i]
-  (if (> (Float/parseFloat i) 1)
+  (if (or (> (Float/parseFloat i) 1)
+          (< (Float/parseFloat i) -1))
     str
     (subs str 0 (dec (count str)))))
 

@@ -1,44 +1,42 @@
 # explain8601
-
-FIXME: description
+Convert an ISO 8601 expression to a human readable description. ISO 8601-1:2019 and parts of ISO 8601-2:2019 are supported, older versions of the standard and RFC 3339 are not supported.
 
 ## Installation
-
-Download from http://example.com/FIXME.
+You can download a release as a jar file from the GitHub releases page. Alternatively see the build section below.
 
 ## Usage
+The basic usage is
 
-FIXME: explanation
+    $ java -jar explain8601-0.1.0-standalone.jar [opts] expression
 
-    $ java -jar explain8601-0.1.0-standalone.jar [args]
+Use the ``-d`` option to show the intermediate results of the conversion.
 
-## Options
+## Build
+Clojure and Leiningen are required to build a jar file, after cloning this repo run:
+    
+    $ lein uberjar
 
-FIXME: listing of options this app accepts.
+### GraalVM native image
+Additionally building a native binary using GraalVM is possible:
+    
+    $ export GRAALVM_HOME=/usr/lib/jvm/java-17-graalvm/bin # this path depends on your GraalVM installation
+    $ $GRAALVM_HOME/gu install native-image # install the native image component
+    $ lein native-image
 
 ## Examples
+TODO
 
-...
+## Bugs
+Not all features from ISO 8601-2:2019 are supported, missing are e.g.:
+- grouped units
+- selection rules
 
-### Bugs
+## Further information
+https://en.wikipedia.org/wiki/ISO\_8601
 
-...
-
-### Any Other Sections
-### That You Think
-### Might be Useful
+freely available related standards:
+https://www.loc.gov/standards/datetime/
+https://standards.calconnect.org/csd/cc-18011.html
 
 ## License
-
-Copyright © 2022 FIXME
-
-This program and the accompanying materials are made available under the
-terms of the Eclipse Public License 2.0 which is available at
-http://www.eclipse.org/legal/epl-2.0.
-
-This Source Code may also be made available under the following Secondary
-Licenses when the conditions for such availability set forth in the Eclipse
-Public License, v. 2.0 are satisfied: GNU General Public License as published by
-the Free Software Foundation, either version 2 of the License, or (at your
-option) any later version, with the GNU Classpath Exception which is available
-at https://www.gnu.org/software/classpath/license.html.
+AGPLv3
