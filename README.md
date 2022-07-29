@@ -35,8 +35,8 @@ Not all features from ISO 8601-2:2019 are supported, missing are e.g.:
 https://en.wikipedia.org/wiki/ISO\_8601
 
 freely available related standards:
-https://www.loc.gov/standards/datetime/
-https://standards.calconnect.org/csd/cc-18011.html
+- https://www.loc.gov/standards/datetime/
+- https://standards.calconnect.org/csd/cc-18011.html
 
 ## License
 AGPLv3
