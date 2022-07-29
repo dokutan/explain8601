@@ -4,11 +4,17 @@
             [clojure.set :as set]))
 
 (defn- triml0
-  "Remove leading zeros from `str`, ignoring a leading minus."
-  [str]
-  (let [r (string/replace str #"^(-)?0*" "$1")]
-    (if (empty? r)
+  "Remove leading zeros from `s`, ignoring a leading minus."
+  [s]
+  (let [r (string/replace s #"^(-)?0*" "$1")]
+    (cond
+      (empty? r)
       "0"
+
+      (or (string/starts-with? r ".") (string/starts-with? r ","))
+      (str "0" r)
+
+      :else
       r)))
 
 (def ^:private flattenv (comp vec flatten))
@@ -62,13 +68,40 @@
     "%" [:qualifier #{:uncertain :approximate}]
     [:qualifier #{}]))
 
+(defn- unit->duration
+  "Convert keyword keys in `m` to their plural form"
+  [m]
+  (merge
+   (dissoc
+    m
+    :year
+    :month
+    :week
+    :day-of
+    :day
+    :hour
+    :minute
+    :second)
+   (condp (fn [key coll] (contains? coll key)) m
+     :year {:years (get m :year)}
+     :month {:months (get m :month)}
+     :week {:weeks (get m :week)}
+     :day-of-year {:days (get m :day-of-year)}
+     :day {:days (get m :day)}
+     :hour {:hours (get m :hour)}
+     :minute {:minutes (get m :minute)}
+     :second {:seconds (get m :second)}
+     {})))
+
 (defn- parse-duration
   "Parse a :duration node"
   [& c]
   (let [minus (first c)
-        c (if (vector? minus)
+        c (if (and (vector? minus)
+                   (= :minus (first minus)))
             (rest c)
-            c)]
+            c)
+        c (map unit->duration (filter map? (flattenv c)))]
     [:duration {:components (vec c)
                 :reverse (vector? minus)}]))
 
@@ -198,7 +231,7 @@
                  n))
              c)
           qualifier (second (first (filter vector? c)))
-          value (triml0 (apply str (filter string? c)))]
+          value (triml0 (.replace (apply str (filter string? c)) "." ","))]
       (if qualifier
         {kw value
          :qualifier qualifier}
@@ -269,10 +302,13 @@
     :day-of-year-e (parse-component :day-of-year)
     :hour (parse-component :hour)
     :hour-e (parse-component :hour)
+    :hour-e-fraction (parse-component :hour)
     :minute (parse-component :minute)
     :minute-e (parse-component :minute)
+    :minute-e-fraction (parse-component :minute)
     :second (parse-component :second)
     :second-e (parse-component :second)
+    :second-e-fraction (parse-component :second)
     :years (parse-component :years)
     :months (parse-component :months)
     :weeks (parse-component :weeks)

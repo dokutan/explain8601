@@ -223,8 +223,8 @@ interval-e                    =/ interval-limit solidus ordinal-date-e 'T' time-
 
 
 ;; recurring interval
-recurring-interval            =  'R' repetitions solidus interval
-recurring-interval            =/ 'R' repetitions solidus interval-e
+recurring-interval            =  <'R'> repetitions <solidus> interval
+recurring-interval            =/ <'R'> repetitions <solidus> interval-e
 repetitions                   =  '-1' / * DIGIT
 
 
