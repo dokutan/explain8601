@@ -7,10 +7,11 @@
   (:gen-class))
 
 (def ^:private usage
-  "explain8601 [opts] expression")
+  "explain8601 [opts] -e expression")
 
 (def ^:private cli-options
-  [["-d" "--debug" "show intermediate results for debugging"]
+  [["-e" "--expression EXPRESSION" "the expression that should be explained"]
+   ["-d" "--debug" "show intermediate results for debugging"]
    ["-h" "--help" "show this help message"]])
 
 (defn -main
@@ -22,11 +23,11 @@
       (println (string/join "\n" (:errors opts)))
 
       (or (:help (:options opts))
-          (zero? (count (:arguments opts))))
+          (not (:expression (:options opts))))
       (println (str usage "\n" (:summary opts)))
 
       :else
-      (let [expression (first (:arguments opts))
+      (let [expression (:expression (:options opts))
             parse-tree-1 (parser/parse-all-8601-1 expression)
             parse-tree-2 (parser/parse-all-8601-2 parse-tree-1)
             parse-tree-3 (parser/parse-all-8601-3 parse-tree-2)

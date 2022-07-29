@@ -7,7 +7,7 @@ You can download a release as a jar file from the GitHub releases page. Alternat
 ## Usage
 The basic usage is
 
-    $ java -jar explain8601-0.1.0-standalone.jar [opts] expression
+    $ java -jar explain8601-0.1.0-standalone.jar [opts] -e expression
 
 Use the ``-d`` option to show the intermediate results of the conversion.
 
@@ -30,6 +30,8 @@ TODO
 Not all features from ISO 8601-2:2019 are supported, missing are e.g.:
 - grouped units
 - selection rules
+
+Expressions are currently not validated, it is therefore easy to produce accepted but invalid expressions.
 
 ## Further information
 https://en.wikipedia.org/wiki/ISO\_8601
