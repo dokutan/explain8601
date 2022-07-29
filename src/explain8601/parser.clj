@@ -46,9 +46,9 @@
                               (= :significant-digits (first sig-digits)))
                      (Integer/parseInt (second sig-digits)))
         year (string/join (filter string? c))
-        year (str sign year (.repeat "0" exponent))
+        year (str year (.repeat "0" exponent))
         r (if sig-digits
-            {:year year
+            {:year (str sign year)
              :min (str sign
                        (.substring year 0 sig-digits)
                        (.repeat "0" (- (.length year) sig-digits)))
@@ -110,11 +110,11 @@
   (let [value (cond
                 (and (vector? limit)
                      (= :interval-limit-unknown (ffirst limit)))
-                :unknown
+                [:unknown]
 
                 (and (vector? limit)
                      (= :interval-limit-open (ffirst limit)))
-                :open
+                [:open]
 
                 (and (= :calendar-date (ffirst limit))
                      (or (= :time (first (second limit)))
@@ -148,7 +148,8 @@
   [start end]
   (if (and (get end :end)
            (get start :start)
-           (map? (first (get end :end))))
+           (or (map? (first (get end :end)))
+               (.contains (str (first (get end :end))) "-tail")))
     (let [end (get end :end)
           start (get start :start)
           end-keys (apply merge (map (fn [e] {(set (keys e)) e}) (filter map? end)))
@@ -280,6 +281,7 @@
    {:expression identity
     :DIGIT identity
     :DIGITX identity
+    :unspecified-value identity
 
     :date-year parse-date-year
     :qualifier parse-qualifier

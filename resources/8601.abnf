@@ -64,7 +64,7 @@ ordinal-date-tail-e           =  day-of-year-e [qualifier] [timezone-e]
 
 
 ; special year forms
-date-year                     =  4 DIGIT [significant-digits]
+date-year                     =  [minus] 4 DIGIT significant-digits
 date-year                     =/ <'Y'> [minus] 5* DIGITX [significant-digits]
 date-year                     =/ <'Y'> [minus] 1* DIGIT exponent [significant-digits]
 exponent                      =  <'E'> 1* DIGIT
@@ -170,9 +170,9 @@ interval                      =/ interval-limit solidus calendar-date-day
 interval                      =/ interval-limit solidus week-date-week
 interval                      =/ interval-limit solidus week-date-day
 interval                      =/ interval-limit solidus ordinal-date
-interval                      =/ interval-limit solidus calendar-date-day 'T' time
-interval                      =/ interval-limit solidus week-date-day 'T' time
-interval                      =/ interval-limit solidus ordinal-date 'T' time
+interval                      =/ interval-limit solidus calendar-date-day <'T'> time
+interval                      =/ interval-limit solidus week-date-day <'T'> time
+interval                      =/ interval-limit solidus ordinal-date <'T'> time
 
 ;; interval (explicit form)
 interval-e                    =  (date-e / date-time-e) solidus duration
@@ -216,9 +216,9 @@ interval-e                    =/ interval-limit solidus calendar-date-day-e
 interval-e                    =/ interval-limit solidus week-date-week-e
 interval-e                    =/ interval-limit solidus week-date-day-e
 interval-e                    =/ interval-limit solidus ordinal-date-e
-interval-e                    =/ interval-limit solidus calendar-date-day-e 'T' time-e
-interval-e                    =/ interval-limit solidus week-date-day-e 'T' time-e
-interval-e                    =/ interval-limit solidus ordinal-date-e 'T' time-e
+interval-e                    =/ interval-limit solidus calendar-date-day-e <'T'> time-e
+interval-e                    =/ interval-limit solidus week-date-day-e <'T'> time-e
+interval-e                    =/ interval-limit solidus ordinal-date-e <'T'> time-e
 
 
 ;; recurring interval
