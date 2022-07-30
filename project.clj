@@ -1,4 +1,4 @@
-(defproject explain8601 "0.1.0-SNAPSHOT"
+(defproject explain8601 "0.1.0"
   :description "Convert an ISO 8601 expression to a human readable description"
   :url "https://github.com/dokutan/explain8601"
   :license {:name "AGPL-3.0"}
