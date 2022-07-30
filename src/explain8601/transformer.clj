@@ -30,9 +30,17 @@
   "Remove trailing 's' from `str` if `i` = 1"
   [str i]
   (if (or (> (Float/parseFloat i) 1)
-          (< (Float/parseFloat i) -1))
+          (< (Float/parseFloat i) -1)
+          (= i "0"))
     str
     (subs str 0 (dec (count str)))))
+
+(defn- parenthesize
+  "Add parantheses aroiund `s` if `s` is not empty"
+  [s]
+  (if (= "" s)
+    s
+    (str " (" s ")")))
 
 (defn- transform-qualifier
   "Describe the `qualifiers`"
@@ -145,32 +153,81 @@
     "3" (str i "rd")
     (str i "th")))
 
+(defn- describe-timezone
+  "Describe a timezone"
+  [& props]
+  (let [props (flatten props)
+        timezone (find-map-with props :timezone)
+        hour (find-map-with (:offset timezone) :hour)
+        minute (find-map-with (:offset timezone) :minute)
+        second (find-map-with (:offset timezone) :second)
+        timezone (:timezone timezone)
+        offset (join-and
+                (filter
+                 string?
+                 [(when hour
+                    (str
+                     (:hour hour)
+                     (singular " hours" (:hour hour))
+                     (transform-qualifier (:qualifier hour))))
+                  (when minute
+                    (str
+                     (:minute minute)
+                     (singular " minutes" (:minute minute))
+                     (transform-qualifier (:qualifier minute))))
+                  (when second
+                    (str
+                     (:second second)
+                     (singular " seconds" (:second second))
+                     (transform-qualifier (:qualifier second))))]))]
+    (case timezone
+      :utc
+      "UTC"
+
+      :plus
+      (str offset " ahead of UTC")
+
+      :minus
+      (str offset " behind UTC")
+
+      "")))
+
+(defn- transform-timezone
+  "Transform a :timezone node"
+  [props & _]
+  (str
+   "the time zone "
+   (describe-timezone props)))
+
 (defn- transform-calendar-date
   "Transform a :calendar-date node"
   [& props]
   (cond
     (:century (first props))
     (format
-     "the century from %s to %s%s"
+     "the century from %s to %s%s%s"
      (:start (first props))
      (:end (first props))
-     (transform-qualifier (:qualifier (first props))))
+     (transform-qualifier (:qualifier (first props)))
+     (parenthesize (describe-timezone props)))
 
     (:decade (first props))
     (format
-     "the decade from %s to %s%s"
+     "the decade from %s to %s%s%s"
      (:start (first props))
      (:end (first props))
-     (transform-qualifier (:qualifier (first props))))
+     (transform-qualifier (:qualifier (first props)))
+     (parenthesize (describe-timezone props)))
 
     (and (:year (first props))
          (:grouping (second props)))
     (format
-     "%s%s of %s%s"
+     "%s%s of %s%s%s"
      (grouping->name (:grouping (second props)))
      (transform-qualifier (:qualifier (second props)))
      (:year (first props))
-     (transform-qualifier (:qualifier (first props))))
+     (transform-qualifier (:qualifier (first props)))
+     (parenthesize (describe-timezone props)))
 
 
     :else
@@ -184,7 +241,8 @@
        (if month
          (str (month->name (:month month)) (transform-qualifier (:qualifier month)) " of ")
          "") 
-       "the year " (:year year) (transform-qualifier (:qualifier year))))))
+       "the year " (:year year) (transform-qualifier (:qualifier year))
+       (parenthesize (describe-timezone props))))))
 
 (defn- transform-week-date
   "Transform a :week-date node"
@@ -199,7 +257,8 @@
      (if week
        (str "the " (ordinal (:week week)) " week" (transform-qualifier (:qualifier week)) " of ")
        "")
-     "the year " (:year year) (transform-qualifier (:qualifier year)))))
+     "the year " (:year year) (transform-qualifier (:qualifier year))
+     (parenthesize (describe-timezone props)))))
 
 (defn- transform-ordinal-date
   "Transform a :ordinal-date node"
@@ -210,7 +269,8 @@
      (if day
        (str "the " (ordinal (:day-of-year day)) " day" (transform-qualifier (:qualifier day)) " of ")
        "")
-     "the year " (:year year) (transform-qualifier (:qualifier year)))))
+     "the year " (:year year) (transform-qualifier (:qualifier year))
+     (parenthesize (describe-timezone props)))))
 
 (defn- transform-time
   "Transform a :time node"
@@ -230,7 +290,8 @@
      (if hour
        (:hour hour)
        "0")
-     " hours" (transform-qualifier (:qualifier hour)))))
+     " hours" (transform-qualifier (:qualifier hour))
+     (parenthesize (describe-timezone props)))))
 
 (defn- transform-duration
   "Tranform a :duration node"
@@ -243,39 +304,54 @@
      " in the reverse direction"
      "")))
 
+(defn- transform-interval-repetitions
+  "Describe the number of repetitions of an interval"
+  [repetitions]
+  (case repetitions
+    nil ""
+    "0" ", not repeating"
+    "1" ", repeating once"
+    :unbounded ", repeating an unbounded number of times"
+    (format ", repeating %s times" repetitions)))
+
 (defn- transform-interval
   "Transform an :interval node"
   [props & _]
   (cond
     (and (:start props) (:end props) (= 1 (count (:start props))))
     (format
-     "an interval with %s start, ending %s"
+     "an interval with %s start, ending %s%s"
      (.replace (str (first (:start props))) ":" "")
-     (first (transform-8601 (seq [(:end props)]))))
+     (first (transform-8601 (seq [(:end props)])))
+     (transform-interval-repetitions (:repetitions props)))
 
     (and (:start props) (:end props) (= 1 (count (:end props))))
     (format
-     "an interval starting %s, end %s"
+     "an interval starting %s, end %s%s"
      (first (transform-8601 (seq [(:start props)])))
-     (.replace (str (first (:end props))) ":" ""))
+     (.replace (str (first (:end props))) ":" "")
+     (transform-interval-repetitions (:repetitions props)))
 
     (and (:start props) (:end props))
     (format
-     "an interval from %s to %s"
+     "an interval from %s to %s%s"
      (first (transform-8601 (seq [(:start props)])))
-     (first (transform-8601 (seq [(:end props)]))))
+     (first (transform-8601 (seq [(:end props)])))
+     (transform-interval-repetitions (:repetitions props)))
 
     (and (:start props) (:duration props))
     (format
-     "an interval from %s, lasting for %s"
+     "an interval from %s, lasting for %s%s"
      (first (transform-8601 (seq [(:start props)])))
-     (first (transform-8601 (seq [(:duration props)]))))
+     (first (transform-8601 (seq [(:duration props)])))
+     (transform-interval-repetitions (:repetitions props)))
 
     (and (:end props) (:duration props))
     (format
-     "an interval lasting for %s, ending %s"
+     "an interval lasting for %s, ending %s%s"
      (first (transform-8601 (seq [(:duration props)])))
-     (first (transform-8601 (seq [(:end props)]))))
+     (first (transform-8601 (seq [(:end props)])))
+     (transform-interval-repetitions (:repetitions props)))
     
     :else
     (str "an interval " props)))
@@ -288,6 +364,7 @@
     :week-date transform-week-date
     :ordinal-date transform-ordinal-date
     :time transform-time
+    :timezone transform-timezone
     :calendar-date-time (fn [& p] (str (apply transform-calendar-date p) " at " (apply transform-time p)))
     :week-date-time (fn [& p] (str (apply transform-week-date p) " at " (apply transform-time p)))
     :ordinal-date-time (fn [& p] (str (apply transform-ordinal-date p) " at " (apply transform-time p)))

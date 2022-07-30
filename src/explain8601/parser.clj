@@ -193,6 +193,20 @@
        state
        (rest c)))))
 
+(defn- parse-recurring-interval
+  "Parse a :recurring-interval node"
+  [& c]
+  (let [interval (second c)
+        repetitions (first c)
+        repetitions (if
+                     (or (= 1 (count repetitions))
+                         (= "-1" (second repetitions)))
+                      :unbounded
+                      (second repetitions))]
+    [(first interval)
+     (assoc (second interval)
+            :repetitions repetitions)]))
+
 (defn- parse-date-time
   "Flatten a date and time expression"
   [kw]
@@ -204,7 +218,7 @@
   [& c]
   (cond
     (and (= 1 (count c)) (=  "Z" (first c)))
-    {:timezone :utc}
+    [:timezone {:timezone :utc}]
 
     :else
     [:timezone
@@ -272,116 +286,119 @@
 (defn parse-all-8601-1
   "The first pass of the parser"
   [string]
-  (insta/parses parse-8601 string))
+  (distinct (insta/parses parse-8601 string)))
 
 (defn parse-all-8601-2
   "The second pass of the parser"
   [tree]
-  (insta/transform
-   {:expression identity
-    :DIGIT identity
-    :DIGITX identity
-    :unspecified-value identity
+  (distinct
+   (insta/transform
+    {:expression identity
+     :DIGIT identity
+     :DIGITX identity
+     :unspecified-value identity
 
-    :date-year parse-date-year
-    :qualifier parse-qualifier
-    :duration parse-duration
+     :date-year parse-date-year
+     :qualifier parse-qualifier
+     :duration parse-duration
 
-    :century (comp (add-start-end :century 2) (parse-component :century))
-    :century-e (comp (add-start-end :century 2) (parse-component :century))
-    :century-expanded (comp (add-start-end :century 2) (parse-component :century))
-    :decade (comp (add-start-end :decade 1) (parse-component :decade))
-    :decade-e (comp (add-start-end :decade 1) (parse-component :decade))
-    :decade-expanded (comp (add-start-end :decade 1) (parse-component :decade))
-    :year (parse-component :year)
-    :year-e (parse-component :year)
-    :year-expanded (parse-component :year)
-    :month (parse-component :month)
-    :month-e (parse-component :month)
-    :grouping (parse-component :grouping)
-    :grouping-e (parse-component :grouping)
-    :week (parse-component :week)
-    :week-e (parse-component :week)
-    :day (parse-component :day)
-    :day-e (parse-component :day)
-    :weekday (parse-component :weekday)
-    :weekday-e (parse-component :weekday)
-    :day-of-year (parse-component :day-of-year)
-    :day-of-year-e (parse-component :day-of-year)
-    :hour (parse-component :hour)
-    :hour-e (parse-component :hour)
-    :hour-e-fraction (parse-component :hour)
-    :minute (parse-component :minute)
-    :minute-e (parse-component :minute)
-    :minute-e-fraction (parse-component :minute)
-    :second (parse-component :second)
-    :second-e (parse-component :second)
-    :second-e-fraction (parse-component :second)
-    :years (parse-component :years)
-    :months (parse-component :months)
-    :weeks (parse-component :weeks)
-    :days (parse-component :days)
-    :hours (parse-component :hours)
-    :minutes (parse-component :minutes)
-    :seconds (parse-component :seconds)
+     :century (comp (add-start-end :century 2) (parse-component :century))
+     :century-e (comp (add-start-end :century 2) (parse-component :century))
+     :century-expanded (comp (add-start-end :century 2) (parse-component :century))
+     :decade (comp (add-start-end :decade 1) (parse-component :decade))
+     :decade-e (comp (add-start-end :decade 1) (parse-component :decade))
+     :decade-expanded (comp (add-start-end :decade 1) (parse-component :decade))
+     :year (parse-component :year)
+     :year-e (parse-component :year)
+     :year-expanded (parse-component :year)
+     :month (parse-component :month)
+     :month-e (parse-component :month)
+     :grouping (parse-component :grouping)
+     :grouping-e (parse-component :grouping)
+     :week (parse-component :week)
+     :week-e (parse-component :week)
+     :day (parse-component :day)
+     :day-e (parse-component :day)
+     :weekday (parse-component :weekday)
+     :weekday-e (parse-component :weekday)
+     :day-of-year (parse-component :day-of-year)
+     :day-of-year-e (parse-component :day-of-year)
+     :hour (parse-component :hour)
+     :hour-e (parse-component :hour)
+     :hour-e-fraction (parse-component :hour)
+     :minute (parse-component :minute)
+     :minute-e (parse-component :minute)
+     :minute-e-fraction (parse-component :minute)
+     :second (parse-component :second)
+     :second-e (parse-component :second)
+     :second-e-fraction (parse-component :second)
+     :years (parse-component :years)
+     :months (parse-component :months)
+     :weeks (parse-component :weeks)
+     :days (parse-component :days)
+     :hours (parse-component :hours)
+     :minutes (parse-component :minutes)
+     :seconds (parse-component :seconds)
 
-    :timezone parse-timezone
-    :timezone-e parse-timezone
+     :timezone parse-timezone
+     :timezone-e parse-timezone
 
-    :calendar-date (move-qualifier :calendar-date)
-    :calendar-date-e (move-qualifier :calendar-date)
-    :calendar-date-day (move-qualifier :calendar-date)
-    :calendar-date-month (move-qualifier :calendar-date)
-    :calendar-date-grouping (move-qualifier :calendar-date)
-    :calendar-date-year (move-qualifier :calendar-date)
-    :calendar-date-decade (move-qualifier :calendar-date)
-    :calendar-date-century (move-qualifier :calendar-date)
-    :calendar-date-day-e (move-qualifier :calendar-date)
-    :calendar-date-month-e (move-qualifier :calendar-date)
-    :calendar-date-grouping-e (move-qualifier :calendar-date)
-    :calendar-date-year-e (move-qualifier :calendar-date)
-    :calendar-date-decade-e (move-qualifier :calendar-date)
-    :calendar-date-century-e (move-qualifier :calendar-date)
-    :week-date (move-qualifier :week-date)
-    :week-date-e (move-qualifier :week-date)
-    :week-date-day (move-qualifier :week-date)
-    :week-date-week (move-qualifier :week-date)
-    :week-date-day-e (move-qualifier :week-date)
-    :week-date-week-e (move-qualifier :week-date)
-    :ordinal-date (move-qualifier :ordinal-date)
-    :ordinal-date-e (move-qualifier :ordinal-date)
-    :calendar-date-time-e (move-qualifier :calendar-date-time)
-    :week-date-time-e (move-qualifier :week-date-time)
-    :ordinal-date-time-e (move-qualifier :ordinal-date-time)
-    :calendar-date-time (move-qualifier :calendar-date-time)
-    :week-date-time (move-qualifier :week-date-time)
-    :ordinal-date-time (move-qualifier :ordinal-date-time)
-    :time (move-qualifier :time)
-    :time-e (move-qualifier :time)
-    :time-hour (move-qualifier :time)
-    :time-hour-e (move-qualifier :time)
-    :time-minute (move-qualifier :time)
-    :time-minute-e (move-qualifier :time)
-    :time-second (move-qualifier :time)
-    :time-second-e (move-qualifier :time)}
-   tree))
+     :calendar-date (move-qualifier :calendar-date)
+     :calendar-date-e (move-qualifier :calendar-date)
+     :calendar-date-day (move-qualifier :calendar-date)
+     :calendar-date-month (move-qualifier :calendar-date)
+     :calendar-date-grouping (move-qualifier :calendar-date)
+     :calendar-date-year (move-qualifier :calendar-date)
+     :calendar-date-decade (move-qualifier :calendar-date)
+     :calendar-date-century (move-qualifier :calendar-date)
+     :calendar-date-day-e (move-qualifier :calendar-date)
+     :calendar-date-month-e (move-qualifier :calendar-date)
+     :calendar-date-grouping-e (move-qualifier :calendar-date)
+     :calendar-date-year-e (move-qualifier :calendar-date)
+     :calendar-date-decade-e (move-qualifier :calendar-date)
+     :calendar-date-century-e (move-qualifier :calendar-date)
+     :week-date (move-qualifier :week-date)
+     :week-date-e (move-qualifier :week-date)
+     :week-date-day (move-qualifier :week-date)
+     :week-date-week (move-qualifier :week-date)
+     :week-date-day-e (move-qualifier :week-date)
+     :week-date-week-e (move-qualifier :week-date)
+     :ordinal-date (move-qualifier :ordinal-date)
+     :ordinal-date-e (move-qualifier :ordinal-date)
+     :calendar-date-time-e (move-qualifier :calendar-date-time)
+     :week-date-time-e (move-qualifier :week-date-time)
+     :ordinal-date-time-e (move-qualifier :ordinal-date-time)
+     :calendar-date-time (move-qualifier :calendar-date-time)
+     :week-date-time (move-qualifier :week-date-time)
+     :ordinal-date-time (move-qualifier :ordinal-date-time)
+     :time (move-qualifier :time)
+     :time-e (move-qualifier :time)
+     :time-hour (move-qualifier :time)
+     :time-hour-e (move-qualifier :time)
+     :time-minute (move-qualifier :time)
+     :time-minute-e (move-qualifier :time)
+     :time-second (move-qualifier :time)
+     :time-second-e (move-qualifier :time)}
+    tree)))
 
 (defn parse-all-8601-3
   "The third pass of the parser"
   [tree]
-  (insta/transform
-   {:interval parse-interval
-    :interval-e parse-interval
+  (distinct
+   (insta/transform
+    {:interval parse-interval
+     :interval-e parse-interval
+     :recurring-interval parse-recurring-interval
 
-    :time (parse-date-time :time)
-    :calendar-date (parse-date-time :calendar-date)
-    :week-date (parse-date-time :week-date)
-    :ordinal-date (parse-date-time :ordinal-date)
-    :calendar-date-time (parse-date-time :calendar-date-time)
-    :week-date-time (parse-date-time :week-date-time)
-    :ordinal-date-time (parse-date-time :ordinal-date-time)
-    :date-time identity
-    :date-time-e identity
-    :date identity
-    :date-e identity}
-   tree))
+     :time (parse-date-time :time)
+     :calendar-date (parse-date-time :calendar-date)
+     :week-date (parse-date-time :week-date)
+     :ordinal-date (parse-date-time :ordinal-date)
+     :calendar-date-time (parse-date-time :calendar-date-time)
+     :week-date-time (parse-date-time :week-date-time)
+     :ordinal-date-time (parse-date-time :ordinal-date-time)
+     :date-time identity
+     :date-time-e identity
+     :date identity
+     :date-e identity}
+    tree)))

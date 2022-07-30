@@ -16,7 +16,9 @@
                     "-P1W" "'-P1W' represents a duration of 1 week in the reverse direction.\n"
                     "-1234S2" "'-1234S2' represents a year between -1200 and -1299, estimated to be -1234.\n"
                     "2022-123" "'2022-123' represents the 123rd day of the year 2022.\n"
-                    "2022-W12-X" "'2022-W12-X' represents an unspecified day of the 12th week of the year 2022.\n"}]
+                    "2022-W12-X" "'2022-W12-X' represents an unspecified day of the 12th week of the year 2022.\n"
+                    "01:02+03" "'01:02+03' represents 2 minutes past 1 hours (3 hours ahead of UTC).\n"
+                    "R3/P1Y/2022" "'R3/P1Y/2022' represents an interval lasting for a duration of 1 year, ending the year 2022, repeating 3 times.\n"}]
     (doall (map
             (fn [s]
               (testing s (is (=
