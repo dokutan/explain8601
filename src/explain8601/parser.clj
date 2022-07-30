@@ -399,21 +399,27 @@
 (defn parse-all-8601-3
   "The third pass of the parser"
   [tree]
-  (distinct
-   (insta/transform
-    {:interval parse-interval
-     :interval-e parse-interval
-     :recurring-interval parse-recurring-interval
+  (let [result (distinct
+                (insta/transform
+                 {:interval parse-interval
+                  :interval-e parse-interval
+                  :recurring-interval parse-recurring-interval
 
-     :time (parse-date-time :time)
-     :calendar-date (parse-date-time :calendar-date)
-     :week-date (parse-date-time :week-date)
-     :ordinal-date (parse-date-time :ordinal-date)
-     :calendar-date-time (parse-date-time :calendar-date-time)
-     :week-date-time (parse-date-time :week-date-time)
-     :ordinal-date-time (parse-date-time :ordinal-date-time)
-     :date-time identity
-     :date-time-e identity
-     :date identity
-     :date-e identity}
-    tree)))
+                  :time (parse-date-time :time)
+                  :calendar-date (parse-date-time :calendar-date)
+                  :week-date (parse-date-time :week-date)
+                  :ordinal-date (parse-date-time :ordinal-date)
+                  :calendar-date-time (parse-date-time :calendar-date-time)
+                  :week-date-time (parse-date-time :week-date-time)
+                  :ordinal-date-time (parse-date-time :ordinal-date-time)
+                  :date-time identity
+                  :date-time-e identity
+                  :date identity
+                  :date-e identity}
+                 tree))
+        result-no-time (filter (fn [e] (not= :time (first e))) result)]
+    (if (and
+         (> (count result) 1)
+         (pos? (count result-no-time)))
+      result-no-time
+      result)))
