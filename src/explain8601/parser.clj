@@ -1,5 +1,6 @@
 (ns explain8601.parser
-  (:require [instaparse.core :as insta]
+  (:require [explain8601.invalidator :as invalidator]
+            [instaparse.core :as insta]
             [clojure.string :as string]
             [clojure.set :as set]))
 
@@ -283,10 +284,21 @@
                     (update-in (first c) [:qualifier] set/union qualifier)))))
         (vec (reverse (conj return kw)))))))
 
+(defn month->grouping
+  "Convert a month to a grouping if the month exceeds 12"
+  [m]
+  (try
+    (if (> (Integer/parseInt (:month m)) 12)
+      {:grouping (:month m)}
+      m)
+    (catch Exception _ m)))
+
 (defn parse-all-8601-1
-  "The first pass of the parser"
-  [string]
-  (distinct (insta/parses parse-8601 string)))
+  "The first pass of the parser, accepts a string `s`"
+  [s]
+  (if (invalidator/invalid-string? s)
+    '()
+    (distinct (insta/parses parse-8601 s))))
 
 (defn parse-all-8601-2
   "The second pass of the parser"
@@ -311,8 +323,8 @@
      :year (parse-component :year)
      :year-e (parse-component :year)
      :year-expanded (parse-component :year)
-     :month (parse-component :month)
-     :month-e (parse-component :month)
+     :month (comp month->grouping (parse-component :month))
+     :month-e (comp month->grouping (parse-component :month))
      :grouping (parse-component :grouping)
      :grouping-e (parse-component :grouping)
      :week (parse-component :week)
