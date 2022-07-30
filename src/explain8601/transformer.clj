@@ -224,7 +224,7 @@
     (and (:year (first props))
          (:grouping (second props)))
     (format
-     "%s%s of %s%s%s"
+     "the %s%s of %s%s%s"
      (grouping->name (:grouping (second props)))
      (transform-qualifier (:qualifier (second props)))
      (:year (first props))
