@@ -3,8 +3,8 @@ expression                    =  date-time-expression / set / set-single
 
 
 ;; set expressions
-set                           =  '{' *(date-time-expression ',') date-time-expression '}'
-set-single                    =  '[' *(date-time-expression ',') date-time-expression ']'
+set                           =  <'{'> *(date-time-expression <','>) date-time-expression <'}'>
+set-single                    =  <'['> *(date-time-expression <','>) date-time-expression <']'>
 
 
 ;; date

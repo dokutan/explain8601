@@ -358,6 +358,20 @@
     :else
     (str "an interval " props)))
 
+(defn- transform-set
+  "Transform a :set node"
+  [& elements]
+  (str
+   "the set containing:\n"
+   (string/join (map (fn [s] (str "  ◦ " s "\n")) elements))))
+
+(defn- transform-set-single
+  "Transform a :set-single node"
+  [& elements]
+  (str
+   "a single element of the set containing:\n"
+   (string/join (map (fn [s] (str "  ◦ " s "\n")) elements))))
+
 (defn transform-8601
   [tree]
   (insta/transform
@@ -371,23 +385,29 @@
     :week-date-time (fn [& p] (str (apply transform-week-date p) " at " (apply transform-time p)))
     :ordinal-date-time (fn [& p] (str (apply transform-ordinal-date p) " at " (apply transform-time p)))
     :interval transform-interval
-    :duration transform-duration}
+    :duration transform-duration
+    :set transform-set
+    :set-single transform-set-single}
    tree))
 
 (defn descriptions->description
   "Convert a sequence of descriptions in to a single string"
   [descriptions expression]
-  (case (count descriptions)
-    0
-    (format
-     "'%s' does not appear to be a valid expression.\n"
-     expression)
-    1
-    (format
-     "'%s' represents %s.\n"
-     expression
-     (first descriptions))
-    (format
-     "'%s' is ambiguous and could represent one of the following:\n%s"
-     expression
-     (string/join (map (fn [s] (str " • " s "\n")) descriptions)))))
+  (.replace
+   (.replace
+    (case (count descriptions)
+      0
+      (format
+       "'%s' does not appear to be a valid expression.\n"
+       expression)
+      1
+      (format
+       "'%s' represents %s.\n"
+       expression
+       (first descriptions))
+      (format
+       "'%s' is ambiguous and could represent one of the following:\n%s"
+       expression
+       (string/join (map (fn [s] (str " • " s "\n")) descriptions))))
+    "\n.\n" "\n")
+   "\n\n" "\n"))
