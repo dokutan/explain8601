@@ -29,11 +29,13 @@
 (defn- singular
   "Remove trailing 's' from `str` if `i` = 1"
   [str i]
-  (if (or (> (Float/parseFloat i) 1)
-          (< (Float/parseFloat i) -1)
-          (= i "0"))
-    str
-    (subs str 0 (dec (count str)))))
+  (try
+    (if (or (> (Float/parseFloat (.replace i "," ".")) 1)
+            (< (Float/parseFloat (.replace i "," ".")) -1)
+            (= i "0"))
+      str
+      (subs str 0 (dec (count str))))
+    (catch Exception _ str)))
 
 (defn- parenthesize
   "Add parantheses aroiund `s` if `s` is not empty"

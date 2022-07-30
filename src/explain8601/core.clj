@@ -44,4 +44,4 @@
           (println "↓")
           (zp/czprint descriptions)
           (println "↓"))
-        (print description)))))
+        (println (string/trim-newline description))))))

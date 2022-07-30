@@ -73,19 +73,19 @@ significant-digits            =  <'S'> 1* DIGIT
 
 ;; time
 time                          =  time-second / time-minute / time-hour
-   time-second                =  [<'T'>] normal-time-second [fraction] [timezone]
-   time-minute                =  [<'T'>] normal-time-minute [fraction] [timezone]
-   time-hour                  =  [<'T'>] hour [fraction] [timezone]
+   time-second                =  [<'T'>] normal-time-second [timezone]
+   time-minute                =  [<'T'>] normal-time-minute [timezone]
+   time-hour                  =  [<'T'>] hour-fraction [timezone]
 time-tail                     =  time-tail-minute / time-tail-second
-  <time-tail-minute>          =  normal-time-tail-minute [fraction] [timezone]
-  <time-tail-second>          =  normal-time-tail-second [fraction] [timezone]
+  <time-tail-minute>          =  normal-time-tail-minute [timezone]
+  <time-tail-second>          =  normal-time-tail-second [timezone]
 
 <normal-time>                 =  normal-time-second / normal-time-minute / hour
-<normal-time-second>          =  (hour [qualifier] <':'> minute [qualifier] <':'> second [qualifier]) / (hour minute second)
-<normal-time-minute>          =  (hour [qualifier] <':'> minute [qualifier]) / (hour minute)
+<normal-time-second>          =  (hour [qualifier] <':'> minute [qualifier] <':'> second-fraction [qualifier]) / (hour minute second-fraction)
+<normal-time-minute>          =  (hour [qualifier] <':'> minute-fraction [qualifier]) / (hour minute-fraction)
 
-<normal-time-tail-second>     =  ([hour [qualifier] <':'> [minute [qualifier] <':'>]] second [qualifier]) / ([hour [minute]] second)
-<normal-time-tail-minute>     =  ([hour [qualifier] <':'>] minute) / (hour minute)
+<normal-time-tail-second>     =  ([hour [qualifier] <':'> [minute [qualifier] <':'>]] second-fraction [qualifier]) / ([hour [minute]] second-fraction)
+<normal-time-tail-minute>     =  ([hour [qualifier] <':'>] minute-fraction) / (hour minute-fraction)
 
 ;; time (explicit form)
 time-e                        =  time-second-e / time-minute-e / time-hour-e
@@ -237,8 +237,11 @@ weekday                       =  [qualifier] ('1' / '2' / '3' / '4' / '5' / '6' 
 day-of-year                   =  [qualifier] 3 DIGITX ; actually 001 - 366
 day                           =  [qualifier] 2 DIGITX
 hour                          =  [qualifier] 2 DIGITX ; actually 00 - 23
+hour-fraction                 =  [qualifier] 2 DIGITX [fraction]
 minute                        =  [qualifier] 2 DIGITX ; actually 00 - 59
+minute-fraction               =  [qualifier] 2 DIGITX [fraction]
 second                        =  [qualifier] 2 DIGITX ; actually 00 - 60
+second-fraction               =  [qualifier] 2 DIGITX [fraction]
 grouping                      =  [qualifier] grouping-value
 
 century-expanded              =  [qualifier] pm 2* DIGITX ; assuming expansion by 0 digits
