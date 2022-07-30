@@ -24,12 +24,18 @@ Additionally building a native binary using GraalVM is possible:
     $ lein native-image
 
 ## Examples
-TODO
+The following is a list of generated descriptions:
+- '2022-22' represents the summer of 2022.
+- '2022/2023' represents an interval from the year 2022 to the year 2023.
+- 'P1YP2W' represents a duration of 1 year and 2 weeks.
+- 'R2/2022-123T00:00/PT1H' represents an interval from the 123rd day of the year 2022 at 0 minutes past 0 hours, lasting for a duration of 1 hour, repeating 2 times.
+- '2022Y7M30~DT1S' represents the 30th day (approximate) of july of the year 2022 at 1 second past 0 hours.
 
 ## Bugs
 Not all features from ISO 8601-2:2019 are supported, missing are e.g.:
 - grouped units
 - selection rules
+- ranges (``..``)
 
 Expressions are currently not validated, it is therefore easy to produce accepted but invalid expressions.
 
