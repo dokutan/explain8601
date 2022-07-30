@@ -1,6 +1,7 @@
-(ns explain8601.invalidator)
+(ns explain8601.invalidator
+  (:require [clojure.string :as string]))
 
 (defn invalid-string?
   "Check if `s` is an invalid expression"
   [s]
-  (.contains s "TT"))
+  (string/includes? s "TT"))
