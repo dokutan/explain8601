@@ -18,6 +18,11 @@
       :else
       r)))
 
+(defn- repeat-str
+  "Repeat `s` `n` times"
+  [s n]
+  (apply str (repeat n s)))
+
 (def ^:private flattenv (comp vec flatten))
 
 (def ^:private parse-8601
@@ -47,15 +52,15 @@
                               (= :significant-digits (first sig-digits)))
                      (Integer/parseInt (second sig-digits)))
         year (string/join (filter string? c))
-        year (str year (.repeat "0" exponent))
+        year (str year (repeat-str "0" exponent))
         r (if sig-digits
             {:year (str sign year)
              :min (str sign
                        (.substring year 0 sig-digits)
-                       (.repeat "0" (- (.length year) sig-digits)))
+                       (repeat-str "0" (- (.length year) sig-digits)))
              :max (str sign
                        (.substring year 0 sig-digits)
-                       (.repeat "9" (- (.length year) sig-digits)))}
+                       (repeat-str "9" (- (.length year) sig-digits)))}
             {:year year})]
     [:date-year r]))
 
@@ -259,8 +264,8 @@
   (fn [m]
     (merge
      m
-     {:start (str (get m k) (.repeat "0" digits))
-      :end   (str (get m k) (.repeat "9" digits))})))
+     {:start (str (get m k) (repeat-str "0" digits))
+      :end   (str (get m k) (repeat-str "9" digits))})))
 
 (defn- move-qualifier
   "Apply free qualifiers to components"
