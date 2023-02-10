@@ -13,7 +13,10 @@
                           transformer/transform-8601
                           (transformer/descriptions->description expression)))
         test-cases {"" "'' does not appear to be a valid expression.\n"
+                    "24:00" "'24:00' represents 0 minutes past 24 hours (the end of the day).\n"
                     "25:00:00" "'25:00:00' does not appear to be a valid expression.\n"
+                    "24:01" "'24:01' does not appear to be a valid expression.\n"
+                    "24:00:01" "'24:00:01' does not appear to be a valid expression.\n"
                     "12:30.5" "'12:30.5' represents 30,5 minutes past 12 hours.\n"
                     "P3W" "'P3W' represents a duration of 3 weeks.\n"
                     "-P1W" "'-P1W' represents a duration of 1 week in the reverse direction.\n"

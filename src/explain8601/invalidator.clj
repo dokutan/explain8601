@@ -6,16 +6,18 @@
   [s]
   (string/includes? s "TT"))
 
-(defn invalid-tree?
-  "Check if `tree` is an invalid parse tree produced by `parser/parse-all-8601-3`"
-  [tree]
-  (let [numberx->float ;; convert a str that can contain 'X' to a float
-        (fn [x] (-> x
-                    (string/replace "X" "0")
-                    (string/replace "," ".")
-                    (Float/parseFloat)))
+(defn numberx->float
+  "convert a str that can contain 'X' to a float"
+  [x]
+  (-> x
+      (string/replace "X" "0")
+      (string/replace "," ".")
+      (Float/parseFloat)))
 
-        checks
+(defn invalid-tree-1?
+  "Check if `tree` is an invalid parse tree produced by `parser/parse-all-8601-3`, part 1"
+  [tree]
+  (let [checks
         {:second (fn [s] (not (<= 0 (numberx->float s) 60)))
          :minute (fn [s] (not (<= 0 (numberx->float s) 59)))
          :hour (fn [s] (not (<= 0 (numberx->float s) 24)))
@@ -41,3 +43,23 @@
       nodes)
      flatten
      (reduce #(or %1 %2)))))
+
+(defn invalid-tree-2?
+  "Check if `tree` is an invalid parse tree produced by `parser/parse-all-8601-3`, part 2"
+  [tree]
+  (let [components (->> tree
+                        flatten
+                        (filter map?)
+                        (apply merge))]
+    (if (= (:hour components) "24")
+      (not
+       (and
+        (zero? (numberx->float (:minute components "0")))
+        (zero? (numberx->float (:second components "0")))))
+      false)))
+
+(defn invalid-tree?
+  "Check if `tree` is an invalid parse tree produced by `parser/parse-all-8601-3`"
+  [tree]
+  (or (invalid-tree-1? tree)
+      (invalid-tree-2? tree)))

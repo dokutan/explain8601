@@ -231,7 +231,6 @@
      (transform-qualifier (:qualifier (first props)))
      (parenthesize (describe-timezone props)))
 
-
     :else
     (let [year (find-map-with props :year)
           month (find-map-with props :month)
@@ -292,7 +291,11 @@
      (if hour
        (:hour hour)
        "0")
-     " hours" (transform-qualifier (:qualifier hour))
+     " hours"
+     (if (string/starts-with? (:hour hour) "24")
+       " (the end of the day)"
+       "")
+     (transform-qualifier (:qualifier hour))
      (parenthesize (describe-timezone props)))))
 
 (defn- transform-duration

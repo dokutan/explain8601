@@ -1,5 +1,5 @@
 # explain8601
-Convert an ISO 8601 expression to a human readable description. ISO 8601-1:2019 and parts of ISO 8601-2:2019 are supported, older versions of the standard and RFC 3339 are not supported.
+Convert an ISO 8601 expression to a human readable description. ISO 8601-1:2019, ISO 8601-1:2019/Amd 1:2022 and parts of ISO 8601-2:2019 are supported, older versions of the standard and RFC 3339 are not supported.
 
 ## Installation
 You can download a release as a jar file from the GitHub releases page. Alternatively see the build section below.
