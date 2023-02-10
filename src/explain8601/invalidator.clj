@@ -18,8 +18,12 @@
         {:second (fn [s] (not (<= 0 (numberx->int s) 60)))
          :minute (fn [s] (not (<= 0 (numberx->int s) 59)))
          :hour (fn [s] (not (<= 0 (numberx->int s) 24)))
-         :day-of-year (fn [s] (not (<= 0 (numberx->int s) 366)))
-         :week (fn [s] (not (<= 0 (numberx->int s) 53)))}
+         :day-of-year (fn [s] (not (or
+                                    (<= 1 (numberx->int s) 366)
+                                    (= s "XXX"))))
+         :week (fn [s] (not (or
+                             (<= 1 (numberx->int s) 53)
+                             (= s "XX"))))}
 
         nodes
         (->> tree
