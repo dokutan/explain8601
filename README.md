@@ -13,8 +13,13 @@ Use the ``-d`` option to show the intermediate results of the conversion.
 
 ## Build
 Clojure and Leiningen are required to build a jar file, after cloning this repo run:
-    
+
     $ lein uberjar
+
+## Test
+Run all tests with
+
+    $ lein test
 
 ### GraalVM native image
 Additionally building a native binary using GraalVM is possible:
@@ -37,7 +42,7 @@ Not all features from ISO 8601-2:2019 are supported, missing are e.g.:
 - selection rules
 - ranges (``..``)
 
-Expressions are currently not validated, it is therefore easy to produce accepted but invalid expressions.
+Expressions are currently not completely validated, it is therefore easy to produce accepted but invalid expressions.
 
 ## Further information
 https://en.wikipedia.org/wiki/ISO_8601

@@ -9,20 +9,21 @@
 (defn invalid-tree?
   "Check if `tree` is an invalid parse tree produced by `parser/parse-all-8601-3`"
   [tree]
-  (let [numberx->int ;; convert a str that can contain 'X' to an int
+  (let [numberx->float ;; convert a str that can contain 'X' to a float
         (fn [x] (-> x
                     (string/replace "X" "0")
-                    (Integer/parseInt)))
+                    (string/replace "," ".")
+                    (Float/parseFloat)))
 
         checks
-        {:second (fn [s] (not (<= 0 (numberx->int s) 60)))
-         :minute (fn [s] (not (<= 0 (numberx->int s) 59)))
-         :hour (fn [s] (not (<= 0 (numberx->int s) 24)))
+        {:second (fn [s] (not (<= 0 (numberx->float s) 60)))
+         :minute (fn [s] (not (<= 0 (numberx->float s) 59)))
+         :hour (fn [s] (not (<= 0 (numberx->float s) 24)))
          :day-of-year (fn [s] (not (or
-                                    (<= 1 (numberx->int s) 366)
+                                    (<= 1 (numberx->float s) 366)
                                     (= s "XXX"))))
          :week (fn [s] (not (or
-                             (<= 1 (numberx->int s) 53)
+                             (<= 1 (numberx->float s) 53)
                              (= s "XX"))))}
 
         nodes

@@ -14,6 +14,7 @@
                           (transformer/descriptions->description expression)))
         test-cases {"" "'' does not appear to be a valid expression.\n"
                     "25:00:00" "'25:00:00' does not appear to be a valid expression.\n"
+                    "12:30.5" "'12:30.5' represents 30,5 minutes past 12 hours.\n"
                     "P3W" "'P3W' represents a duration of 3 weeks.\n"
                     "-P1W" "'-P1W' represents a duration of 1 week in the reverse direction.\n"
                     "-1234S2" "'-1234S2' represents a year between -1200 and -1299, estimated to be -1234.\n"
