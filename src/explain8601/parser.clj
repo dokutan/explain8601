@@ -422,7 +422,11 @@
                   :date identity
                   :date-e identity}
                  tree))
+        result (filter (complement invalidator/invalid-tree?) result)
         result-no-time (filter (fn [e] (not= :time (first e))) result)]
+
+    ;; If the result could be a time or date(+time) expression, discard the time-only results.
+    ;; This fixes the ambiguity of e.g. '1200' as T12:00 or the year 1200.
     (if (and
          (> (count result) 1)
          (pos? (count result-no-time)))
