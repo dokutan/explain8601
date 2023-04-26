@@ -222,18 +222,25 @@
 (defn- parse-timezone
   "Parse a :timezone node"
   [& c]
-  (cond
-    (and (= 1 (count c)) (=  "Z" (first c)))
+  (if
+   (and (= 1 (count c)) (=  "Z" (first c)))
     [:timezone {:timezone :utc}]
 
-    :else
-    [:timezone
-     {:timezone
-      (if (and (= :pm (ffirst (filter vector? c)))
-               (= "+" (second (first (filter vector? c)))))
-        :plus
-        :minus)
-      :offset (vec (filter map? c))}]))
+    (let [sign
+          (filter
+           #(and (vector? %)
+                 (or
+                  (= :pm (first %))
+                  (= :minus (first %))))
+           c)
+
+          [[_ sign]] sign
+
+          sign
+          (if (= "-" sign)
+            :minus
+            :plus)]
+      [:timezone {:timezone sign :offset (vec (filter map? c))}])))
 
 (defn- parse-component
   "Generic function for parsing components like year, month, …"

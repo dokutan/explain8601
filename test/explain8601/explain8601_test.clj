@@ -24,7 +24,13 @@
                     "2022-123" "'2022-123' represents the 123rd day of the year 2022.\n"
                     "2022-W12-X" "'2022-W12-X' represents an unspecified day of the 12th week of the year 2022.\n"
                     "01:02+03" "'01:02+03' represents 2 minutes past 1 hours (3 hours ahead of UTC).\n"
-                    "R3/P1Y/2022" "'R3/P1Y/2022' represents an interval lasting for a duration of 1 year, ending the year 2022, repeating 3 times.\n"}]
+                    "R3/P1Y/2022" "'R3/P1Y/2022' represents an interval lasting for a duration of 1 year, ending the year 2022, repeating 3 times.\n"
+                    "+05:00" "'+05:00' represents the time zone 5 hours and 0 minutes ahead of UTC.\n"
+                    "-05:00" "'-05:00' represents the time zone 5 hours and 0 minutes behind UTC.\n"
+                    "Z-5H" "'Z-5H' represents the time zone 5 hours behind UTC.\n"
+                    "Z5H" "'Z5H' represents the time zone 5 hours ahead of UTC.\n"
+                    "Z-5H0M" "'Z-5H0M' represents the time zone 5 hours and 0 minutes behind UTC.\n"
+                    "Z5H0M" "'Z5H0M' represents the time zone 5 hours and 0 minutes ahead of UTC.\n"}]
     (doall (map
             (fn [s]
               (testing s (is (=

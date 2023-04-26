@@ -101,7 +101,7 @@ time-e                        =  time-second-e / time-minute-e / time-hour-e
 timezone                      =  'Z' / (pm hour [[<':'>] minute])
 
 ;; time zone designator (explicit form)
-timezone-e                    =  'Z' [[minus] hour-e / ([hour-e] minute-e) / ([hour-e] [minute-e] second-e)]
+timezone-e                    =  'Z' [([minus] hour-e) / ([[minus] hour-e] minute-e) / ([[minus] hour-e] [minute-e] second-e)]
 
 
 ;; date + time
