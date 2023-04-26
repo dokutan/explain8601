@@ -30,7 +30,8 @@
                     "Z-5H" "'Z-5H' represents the time zone 5 hours behind UTC.\n"
                     "Z5H" "'Z5H' represents the time zone 5 hours ahead of UTC.\n"
                     "Z-5H0M" "'Z-5H0M' represents the time zone 5 hours and 0 minutes behind UTC.\n"
-                    "Z5H0M" "'Z5H0M' represents the time zone 5 hours and 0 minutes ahead of UTC.\n"}]
+                    "Z5H0M" "'Z5H0M' represents the time zone 5 hours and 0 minutes ahead of UTC.\n"
+                    "T0S" "'T0S' represents 0 seconds past 0 hours.\n"}]
     (doall (map
             (fn [s]
               (testing s (is (=

@@ -292,7 +292,7 @@
        (:hour hour)
        "0")
      " hours"
-     (if (string/starts-with? (:hour hour) "24")
+     (if (and (string? hour) (string/starts-with? (:hour hour) "24"))
        " (the end of the day)"
        "")
      (transform-qualifier (:qualifier hour))
